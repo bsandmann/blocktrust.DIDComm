@@ -15,6 +15,11 @@ public class SecretResolverInMemory : ISecretResolver
     {
         this.secrets = secrets;
     }
+    
+    public SecretResolverInMemory()
+    {
+        this.secrets = new Dictionary<string, Secret>();
+    }
 
     public Secret? FindKey(string kid) =>
         secrets.ContainsKey(kid) ? secrets[kid] : null;

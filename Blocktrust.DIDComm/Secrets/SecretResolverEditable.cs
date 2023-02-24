@@ -24,4 +24,9 @@ public class SecretResolverEditable : ISecretResolver
     {
         throw new NotImplementedException();
     }
+
+    public void AddKey(string kid, Secret secret)
+    {
+        throw new NotImplementedException();
+    }
 }

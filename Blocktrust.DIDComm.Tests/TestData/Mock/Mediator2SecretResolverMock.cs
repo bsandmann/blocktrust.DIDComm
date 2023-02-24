@@ -98,4 +98,9 @@ public class Mediator2SecretResolverMock : SecretResolverInMemoryMock
     {
         return _secretResolverInMemory.FindKeys(kids);
     }
+
+    public void AddKey(string kid, Secret secret)
+    {
+        throw new NotImplementedException();
+    }
 }

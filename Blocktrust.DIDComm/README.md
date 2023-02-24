@@ -1,1 +1,0 @@
-# blocktrust.DIDComm
