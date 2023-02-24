@@ -51,7 +51,7 @@ public class DIDCommRoutingTest
              secretResolver: _mediator1SecretResolver
          );
      
-         var forwardedMsg = JsonUtils.ToJson(forwardBob.ForwardMsg.ForwardedMsg);
+         var forwardedMsg = JsonUtils.ToJson(forwardBob.Value.ForwardMsg.ForwardedMsg);
      
          // BOB
          var unpackResult = _didComm.Unpack(
@@ -60,16 +60,16 @@ public class DIDCommRoutingTest
                  .BuildUnpackParams()
          );
      
-         message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-         message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+         message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
          
-         Assert.True(unpackResult.Metadata.Encrypted);
-         Assert.True(unpackResult.Metadata.Authenticated);
-         Assert.False(unpackResult.Metadata.NonRepudiation);
-         Assert.False(unpackResult.Metadata.AnonymousSender);
-         Assert.False(unpackResult.Metadata.ReWrappedInForward);
+         Assert.True(unpackResult.Value.Metadata.Encrypted);
+         Assert.True(unpackResult.Value.Metadata.Authenticated);
+         Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+         Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+         Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
      }
     
      [Fact]
@@ -99,7 +99,7 @@ public class DIDCommRoutingTest
              secretResolver: _mediator2SecretResolver
          );
          
-         var forwardedMsg = JsonUtils.ToJson(forwardCharlie.ForwardMsg.ForwardedMsg);
+         var forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
          
          // CHARLIE's second mediator (MEDIATOR1)
          forwardCharlie = _routing.UnpackForward(
@@ -107,7 +107,7 @@ public class DIDCommRoutingTest
              secretResolver: _mediator1SecretResolver
          );
          
-         forwardedMsg = JsonUtils.ToJson(forwardCharlie.ForwardMsg.ForwardedMsg);
+         forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
          
          // CHARLIE
          var unpackResult = _didComm.Unpack(
@@ -117,16 +117,16 @@ public class DIDCommRoutingTest
                  .BuildUnpackParams()
          );
          
-         message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-         message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+         message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
          
-         Assert.True(unpackResult.Metadata.Encrypted);
-         Assert.True(unpackResult.Metadata.Authenticated);
-         Assert.False(unpackResult.Metadata.NonRepudiation);
-         Assert.False(unpackResult.Metadata.AnonymousSender);
-         Assert.False(unpackResult.Metadata.ReWrappedInForward);
+         Assert.True(unpackResult.Value.Metadata.Encrypted);
+         Assert.True(unpackResult.Value.Metadata.Authenticated);
+         Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+         Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+         Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
      }
 
      [Fact]
@@ -155,12 +155,12 @@ public class DIDCommRoutingTest
              secretResolver: _mediator1SecretResolver
          );
      
-         var nextTo = forwardBob.ForwardMsg.ForwardNext;
+         var nextTo = forwardBob.Value.ForwardMsg.ForwardNext;
          Assert.NotNull(nextTo);
      
          // re-wrap to unexpected mediator (MEDIATOR2 here)
          var wrapResult = _routing.WrapInForward(
-             forwardBob.ForwardMsg.ForwardedMsg,
+             forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { MEDIATOR2_DID },
              headers: new Dictionary<string, object> { { "somefield", 99999 } }
@@ -174,7 +174,7 @@ public class DIDCommRoutingTest
              secretResolver: _mediator2SecretResolver
          );
      
-         var forwardedMsg = JsonUtils.ToJson(forwardBob.ForwardMsg.ForwardedMsg);
+         var forwardedMsg = JsonUtils.ToJson(forwardBob.Value.ForwardMsg.ForwardedMsg);
      
          // BOB
          var unpackResult = _didComm.Unpack(
@@ -183,16 +183,16 @@ public class DIDCommRoutingTest
                  .BuildUnpackParams()
          );
      
-         message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-         message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+         message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
          
-         Assert.True(unpackResult.Metadata.Encrypted);
-         Assert.True(unpackResult.Metadata.Authenticated);
-         Assert.False(unpackResult.Metadata.NonRepudiation);
-         Assert.False(unpackResult.Metadata.AnonymousSender);
-         Assert.False(unpackResult.Metadata.ReWrappedInForward);
+         Assert.True(unpackResult.Value.Metadata.Encrypted);
+         Assert.True(unpackResult.Value.Metadata.Authenticated);
+         Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+         Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+         Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
      }
 
      [Fact]
@@ -218,12 +218,12 @@ public class DIDCommRoutingTest
              secretResolver: _mediator1SecretResolver
          );
      
-         var nextTo = forwardBob.ForwardMsg.ForwardNext;
+         var nextTo = forwardBob.Value.ForwardMsg.ForwardNext;
          Assert.NotNull(nextTo);
      
          // re-wrap to the receiver
          var wrapResult = _routing.WrapInForward(
-             forwardBob.ForwardMsg.ForwardedMsg,
+             forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { nextTo },
              headers: new Dictionary<string, object> { { "somefield", 99999 } }
@@ -239,18 +239,18 @@ public class DIDCommRoutingTest
                  .BuildUnpackParams()
          );
      
-         message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-         message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+         message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
          
          // FIXME here first anon for forward is mixed with inner anon for initial message
          //       in the same metadata
-         Assert.True(unpackResult.Metadata.Encrypted);
-         Assert.False(unpackResult.Metadata.Authenticated);
-         Assert.False(unpackResult.Metadata.NonRepudiation);
-         Assert.True(unpackResult.Metadata.AnonymousSender);
-         Assert.True(unpackResult.Metadata.ReWrappedInForward);
+         Assert.True(unpackResult.Value.Metadata.Encrypted);
+         Assert.False(unpackResult.Value.Metadata.Authenticated);
+         Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+         Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+         Assert.True(unpackResult.Value.Metadata.ReWrappedInForward);
      }
 
      [Fact]
@@ -279,12 +279,12 @@ public class DIDCommRoutingTest
              secretResolver: _mediator1SecretResolver
          );
     
-         var nextTo = forwardBob.ForwardMsg.ForwardNext;
+         var nextTo = forwardBob.Value.ForwardMsg.ForwardNext;
          Assert.NotNull(nextTo);
     
          // re-wrap to the receiver
          var wrapResult = _routing.WrapInForward(
-             forwardBob.ForwardMsg.ForwardedMsg,
+             forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { nextTo },
              headers: new Dictionary<string, object> { { "somefield", 99999 } }
@@ -300,17 +300,17 @@ public class DIDCommRoutingTest
                  .BuildUnpackParams()
          );
     
-         message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-         message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+         message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+         message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+         message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
          // FIXME here first anon for forward is mixed with inner auth for initial message
          //       in the same metadata
-         Assert.True(unpackResult.Metadata.Encrypted);
-         Assert.True(unpackResult.Metadata.Authenticated);
-         Assert.False(unpackResult.Metadata.NonRepudiation);
-         Assert.True(unpackResult.Metadata.AnonymousSender);
-         Assert.True(unpackResult.Metadata.ReWrappedInForward);
+         Assert.True(unpackResult.Value.Metadata.Encrypted);
+         Assert.True(unpackResult.Value.Metadata.Authenticated);
+         Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+         Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+         Assert.True(unpackResult.Value.Metadata.ReWrappedInForward);
      }
 
     [Fact]
@@ -337,15 +337,15 @@ public class DIDCommRoutingTest
                 .BuildUnpackParams()
         );
     
-        var forwardMessage = ForwardMessage.FromMessage(unpackResultAtMediator.Message);
+        var forwardMessage = ForwardMessage.FromMessage(unpackResultAtMediator.Value.Message);
         Assert.NotNull(forwardMessage);
         Assert.Equal(BOB_DID, forwardMessage.ForwardNext);
     
-        Assert.True(unpackResultAtMediator.Metadata.Encrypted);
-        Assert.False(unpackResultAtMediator.Metadata.Authenticated);
-        Assert.False(unpackResultAtMediator.Metadata.NonRepudiation);
-        Assert.True(unpackResultAtMediator.Metadata.AnonymousSender);
-        Assert.False(unpackResultAtMediator.Metadata.ReWrappedInForward);
+        Assert.True(unpackResultAtMediator.Value.Metadata.Encrypted);
+        Assert.False(unpackResultAtMediator.Value.Metadata.Authenticated);
+        Assert.False(unpackResultAtMediator.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResultAtMediator.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResultAtMediator.Value.Metadata.ReWrappedInForward);
     
         // BOB
         var unpackResult = _didComm.Unpack(
@@ -355,15 +355,15 @@ public class DIDCommRoutingTest
                 .BuildUnpackParams()
         );
     
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
     
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.False(unpackResult.Metadata.Authenticated);
-        Assert.False(unpackResult.Metadata.NonRepudiation);
-        Assert.True(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.False(unpackResult.Value.Metadata.Authenticated);
+        Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 }

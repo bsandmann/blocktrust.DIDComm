@@ -60,13 +60,13 @@ public class PackSignedTests
                 .BuildUnpackParams()
         );
 
-        Assert.Equal(unpackResult.Message.ToString(), data.Msg.ToString());
-        Assert.True(unpackResult.Metadata.NonRepudiation);
-        Assert.True(unpackResult.Metadata.Authenticated);
-        Assert.Null(unpackResult.Metadata.EncAlgAnon);
-        Assert.Null(unpackResult.Metadata.EncAlgAuth);
-        Assert.False(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.Encrypted);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        Assert.Equal(unpackResult.Value.Message.ToString(), data.Msg.ToString());
+        Assert.True(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
+        Assert.Null(unpackResult.Value.Metadata.EncAlgAnon);
+        Assert.Null(unpackResult.Value.Metadata.EncAlgAuth);
+        Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.Encrypted);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 }

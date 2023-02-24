@@ -3,6 +3,7 @@
 using Blocktrust.Common.Resolver;
 using Crypto.JWS;
 using Crypto.Keys;
+using FluentResults;
 using Model.PackEncryptedParamsModels;
 using Model.PackEncryptedResultModels;
 using Model.PackPlaintextParamsModels;
@@ -91,7 +92,7 @@ public class DidComm
         );
     }
 
-    public UnpackResult Unpack(UnpackParams param)
+    public Result<UnpackResult> Unpack(UnpackParams param)
     {
         var didDocResolver = param.IdidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;

@@ -25,26 +25,26 @@ public class EncryptedMessageTests
                     .BuildUnpackParams()
             );
 
-            JWMFixture.PLAINTEXT_MESSAGE.Should().BeEquivalentTo(unpacked.Message, options => options.Excluding(x => x.Body));
+            JWMFixture.PLAINTEXT_MESSAGE.Should().BeEquivalentTo(unpacked.Value.Message, options => options.Excluding(x => x.Body));
             //TODO extend to test to also check the body in detail
-            JWMFixture.PLAINTEXT_MESSAGE.Body.Count.Should().Be(unpacked.Message.Body.Count);
-            JWMFixture.PLAINTEXT_MESSAGE.Body.First().Key.Should().BeEquivalentTo(unpacked.Message.Body.First().Key);
+            JWMFixture.PLAINTEXT_MESSAGE.Body.Count.Should().Be(unpacked.Value.Message.Body.Count);
+            JWMFixture.PLAINTEXT_MESSAGE.Body.First().Key.Should().BeEquivalentTo(unpacked.Value.Message.Body.First().Key);
 
-            Assert.Equal(tv.expectedMetadata.Encrypted, unpacked.Metadata.Encrypted);
-            Assert.Equal(tv.expectedMetadata.Authenticated, unpacked.Metadata.Authenticated);
-            Assert.Equal(tv.expectedMetadata.AnonymousSender, unpacked.Metadata.AnonymousSender);
-            Assert.Equal(tv.expectedMetadata.NonRepudiation, unpacked.Metadata.NonRepudiation);
+            Assert.Equal(tv.expectedMetadata.Encrypted, unpacked.Value.Metadata.Encrypted);
+            Assert.Equal(tv.expectedMetadata.Authenticated, unpacked.Value.Metadata.Authenticated);
+            Assert.Equal(tv.expectedMetadata.AnonymousSender, unpacked.Value.Metadata.AnonymousSender);
+            Assert.Equal(tv.expectedMetadata.NonRepudiation, unpacked.Value.Metadata.NonRepudiation);
 
-            Assert.Equivalent(tv.expectedMetadata.EncAlgAnon, unpacked.Metadata.EncAlgAnon);
-            Assert.Equivalent(tv.expectedMetadata.EncAlgAuth, unpacked.Metadata.EncAlgAuth);
+            Assert.Equivalent(tv.expectedMetadata.EncAlgAnon, unpacked.Value.Metadata.EncAlgAnon);
+            Assert.Equivalent(tv.expectedMetadata.EncAlgAuth, unpacked.Value.Metadata.EncAlgAuth);
 
-            Assert.Equal(tv.expectedMetadata.EncryptedFrom, unpacked.Metadata.EncryptedFrom);
-            Assert.Equivalent(tv.expectedMetadata.EncryptedTo, unpacked.Metadata.EncryptedTo);
+            Assert.Equal(tv.expectedMetadata.EncryptedFrom, unpacked.Value.Metadata.EncryptedFrom);
+            Assert.Equivalent(tv.expectedMetadata.EncryptedTo, unpacked.Value.Metadata.EncryptedTo);
 
-            Assert.Equal(tv.expectedMetadata.SignAlg, unpacked.Metadata.SignAlg);
-            Assert.Equal(tv.expectedMetadata.SignFrom, unpacked.Metadata.SignFrom);
+            Assert.Equal(tv.expectedMetadata.SignAlg, unpacked.Value.Metadata.SignAlg);
+            Assert.Equal(tv.expectedMetadata.SignFrom, unpacked.Value.Metadata.SignFrom);
             var expectedSignedMessage = tv.expectedMetadata.SignedMessage != null;
-            var actualSignedMessage = unpacked.Metadata.SignedMessage != null;
+            var actualSignedMessage = unpacked.Value.Metadata.SignedMessage != null;
             Assert.Equal(expectedSignedMessage, actualSignedMessage);
         }
     }
@@ -84,7 +84,7 @@ public class EncryptedMessageTests
             secretResolver: new Mediator2SecretResolverMock()
         );
 
-        var forwardedMsg = forwardCharlie.ForwardMsg.ForwardedMsg.ToJsonString();
+        var forwardedMsg = forwardCharlie.Value.ForwardMsg.ForwardedMsg.ToJsonString();
         
         // CHARLIE's second mediator (MEDIATOR1)
         forwardCharlie = routing.UnpackForward(
@@ -92,7 +92,7 @@ public class EncryptedMessageTests
             secretResolver: new Mediator1SecretResolverMock()
         );
         
-        forwardedMsg = forwardCharlie.ForwardMsg.ForwardedMsg.ToJsonString();
+        forwardedMsg = forwardCharlie.Value.ForwardMsg.ForwardedMsg.ToJsonString();
 
         // CHARLIE
         var unpacked = didComm.Unpack(
@@ -108,7 +108,7 @@ public class EncryptedMessageTests
             "did:example:charlie#key-x25519-3"
         };
         
-        Assert.Equal(expectedKids, unpacked.Metadata.EncryptedTo);
+        Assert.Equal(expectedKids, unpacked.Value.Metadata.EncryptedTo);
     }
 
     [Fact]
@@ -117,15 +117,15 @@ public class EncryptedMessageTests
         var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
         var expected = "Decrypt is failed";
 
-        var exception = Assert.Throws<MalformedMessageException>(() =>
+        var result =
             didComm.Unpack(
                 new UnpackParamsBuilder(JWEFixture.BOB_DAMAGED_MESSAGE)
                     .ExpectDecryptByAllKeys(true)
                     .BuildUnpackParams()
-            )
-        );
+            );
 
-        Assert.Contains(expected, exception.Message);
+        result.IsFailed.Should().BeTrue();
+        Assert.Contains(expected, result.Errors.First().Message);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class EncryptedMessageTests
                 .BuildUnpackParams()
         );
 
-        Assert.Equivalent(expected, unpack.Metadata.EncryptedTo);
+        Assert.Equivalent(expected, unpack.Value.Metadata.EncryptedTo);
     }
 
     [Fact]
@@ -150,9 +150,9 @@ public class EncryptedMessageTests
             var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
 
 
-            Action act = () => didComm.Unpack(tv.unpackParams);
-            act.Should().Throw<DidCommException>()
-                .WithMessage($"*{tv.expectedMessage}*");
+            var result= didComm.Unpack(tv.unpackParams);
+            result.IsFailed.Should().BeTrue();
+            result.Errors.First().Message.Should().Contain($"{tv.expectedMessage}");
         }
     }
 

@@ -7,6 +7,7 @@ using Common.Algorithms;
 using Crypto.JWE;
 using Crypto.Keys;
 using Exceptions;
+using FluentResults;
 using ForwardMessages;
 using Model.PackEncryptedParamsModels;
 using Model.PackEncryptedResultModels;
@@ -90,7 +91,7 @@ public class Routing
         string toDid = DidUtils.GetDid(to);
         // TODO this copy() is not needed for single tests, but not having it breaks the tests when running in parallel
         // This issue has to be investigated and cleared up before merging
-         
+
         DidDoc? didDoc = ididDocResolver.Resolve(toDid).Copy();
         if (didDoc is null)
         {
@@ -164,7 +165,7 @@ public class Routing
         // wrap forward msgs in reversed order so the message to final
         // recipient 'to' will be the innermost one
         var toNextZipped = tos.Zip(nexts).ToList();
-        
+
         for (var i = 0; i < toNextZipped.Count; i++)
         {
             var fwdMsgBuilder = new ForwardMessageBuilder(
@@ -213,7 +214,7 @@ public class Routing
     }
 
 
-    public UnpackForwardResult UnpackForward(
+    public Result<UnpackForwardResult> UnpackForward(
         string packedMessage,
         bool expectDecryptByAllKeys = false,
         IDidDocResolver? didDocResolver = null,
@@ -224,20 +225,27 @@ public class Routing
         ISecretResolver _secretResolver = secretResolver ?? this._secretResolver;
         RecipientKeySelector recipientKeySelector = new RecipientKeySelector(ididDocResolver, _secretResolver);
 
-        UnpackResult unpackResult = Unpacker.Unpack(
+        var unpackResult = Unpacker.Unpack(
             new UnpackParamsBuilder(packedMessage)
                 .ExpectDecryptByAllKeys(expectDecryptByAllKeys)
                 .UnwrapReWrappingForward(false)
                 .BuildUnpackParams(),
             recipientKeySelector
         );
-        ForwardMessage? forwardMessage = ForwardMessage.FromMessage(unpackResult.Message);
+        if (unpackResult.IsFailed)
+        {
+            return unpackResult.ToResult();
+        }
 
-        return forwardMessage != null
-            ? new UnpackForwardResult(
-                forwardMessage,
-                unpackResult.Metadata.EncryptedTo
-            )
-            : throw new MalformedMessageException("Invalid forward message");
+        ForwardMessage? forwardMessage = ForwardMessage.FromMessage(unpackResult.Value.Message);
+
+        if (forwardMessage is null)
+        {
+            return Result.Fail("Invalid forward message");
+        }
+
+        return Result.Ok(new UnpackForwardResult(
+            forwardMessage,
+            unpackResult.Value.Metadata.EncryptedTo));
     }
 }

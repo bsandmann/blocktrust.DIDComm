@@ -47,15 +47,15 @@ public class DIDCommDemoTest
 
         //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
         // Assert.Equivalent(message, unpackResult.message);
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.True(unpackResult.Metadata.Authenticated);
-        Assert.False(unpackResult.Metadata.NonRepudiation);
-        Assert.False(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
+        Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -83,15 +83,15 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
 
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.True(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.Authenticated);
-        Assert.False(unpackResult.Metadata.NonRepudiation);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.Authenticated);
+        Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -122,15 +122,15 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
 
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.True(unpackResult.Metadata.Authenticated);
-        Assert.True(unpackResult.Metadata.NonRepudiation);
-        Assert.False(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
+        Assert.True(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -162,15 +162,15 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
     
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.True(unpackResult.Metadata.Authenticated);
-        Assert.True(unpackResult.Metadata.NonRepudiation);
-        Assert.True(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
+        Assert.True(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -196,15 +196,15 @@ public class DIDCommDemoTest
             new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
         );
         
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.True(unpackResult.Metadata.NonRepudiation);
-        Assert.True(unpackResult.Metadata.Authenticated);
-        Assert.False(unpackResult.Metadata.Encrypted);
-        Assert.False(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.True(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
+        Assert.False(unpackResult.Value.Metadata.Encrypted);
+        Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -231,16 +231,16 @@ public class DIDCommDemoTest
         );
 
         //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
-        // Assert.Equivalent(message, unpackResult.message);
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.False(unpackResult.Metadata.NonRepudiation);
-        Assert.False(unpackResult.Metadata.Encrypted);
-        Assert.False(unpackResult.Metadata.Authenticated);
-        Assert.False(unpackResult.Metadata.AnonymousSender);
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        // Assert.Equivalent(message, unpackResult.Value.message);
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.False(unpackResult.Value.Metadata.NonRepudiation);
+        Assert.False(unpackResult.Value.Metadata.Encrypted);
+        Assert.False(unpackResult.Value.Metadata.Authenticated);
+        Assert.False(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 
     [Fact]
@@ -273,11 +273,11 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
         
-        Assert.True(unpackResultBob.Metadata.Encrypted);
-        Assert.True(unpackResultBob.Metadata.Authenticated);
-        Assert.True(unpackResultBob.Metadata.NonRepudiation);
-        Assert.True(unpackResultBob.Metadata.AnonymousSender);
-        Assert.False(unpackResultBob.Metadata.ReWrappedInForward);
+        Assert.True(unpackResultBob.Value.Metadata.Encrypted);
+        Assert.True(unpackResultBob.Value.Metadata.Authenticated);
+        Assert.True(unpackResultBob.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResultBob.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResultBob.Value.Metadata.ReWrappedInForward);
 
         var packResultCharlie = didComm.PackEncrypted(
             PackEncryptedParams.Builder(message, CHARLIE_DID)
@@ -293,14 +293,14 @@ public class DIDCommDemoTest
             secretResolver: new Mediator2SecretResolverMock()
         );
     
-        var forwardedMsg = JsonUtils.ToJson(forwardCharlie.ForwardMsg.ForwardedMsg);
+        var forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
     
         forwardCharlie = routing.UnpackForward(
             forwardedMsg,
             secretResolver: new Mediator1SecretResolverMock()
         );
     
-        forwardedMsg = JsonUtils.ToJson(forwardCharlie.ForwardMsg.ForwardedMsg);
+        forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
     
         var unpackResultCharlie = didComm.Unpack(
             new UnpackParamsBuilder(forwardedMsg)
@@ -308,34 +308,34 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
         
-        Assert.True(unpackResultCharlie.Metadata.Encrypted);
-        Assert.True(unpackResultCharlie.Metadata.Authenticated);
-        Assert.True(unpackResultCharlie.Metadata.NonRepudiation);
-        Assert.True(unpackResultCharlie.Metadata.AnonymousSender);
-        Assert.False(unpackResultCharlie.Metadata.ReWrappedInForward);
+        Assert.True(unpackResultCharlie.Value.Metadata.Encrypted);
+        Assert.True(unpackResultCharlie.Value.Metadata.Authenticated);
+        Assert.True(unpackResultCharlie.Value.Metadata.NonRepudiation);
+        Assert.True(unpackResultCharlie.Value.Metadata.AnonymousSender);
+        Assert.False(unpackResultCharlie.Value.Metadata.ReWrappedInForward);
     
         //TODO
-        message.Should().BeEquivalentTo(unpackResultBob.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResultBob.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResultBob.Message.Body.First().Key);
+        message.Should().BeEquivalentTo(unpackResultBob.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResultBob.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResultBob.Value.Message.Body.First().Key);
        
         //TODO
-        message.Should().BeEquivalentTo(unpackResultCharlie.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResultCharlie.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResultCharlie.Message.Body.First().Key);
+        message.Should().BeEquivalentTo(unpackResultCharlie.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResultCharlie.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResultCharlie.Value.Message.Body.First().Key);
         
-        unpackResultBob.Message.To = null;
-        unpackResultBob.Metadata.EncryptedTo = null;
-        unpackResultBob.Metadata.SignedMessage = null;
-        unpackResultBob.Metadata.EncryptedTo = null;
-        unpackResultBob.Metadata.SignedMessage = null;
-        unpackResultCharlie.Message.To = null;
-        unpackResultCharlie.Metadata.EncryptedTo = null;
-        unpackResultCharlie.Metadata.SignedMessage = null;
-        unpackResultCharlie.Metadata.EncryptedTo = null;
-        unpackResultCharlie.Metadata.SignedMessage = null;
-        unpackResultBob.Message.Should().BeEquivalentTo(unpackResultCharlie.Message, options => options.Excluding(x => x.Body));
-        unpackResultBob.Metadata.Should().BeEquivalentTo(unpackResultCharlie.Metadata);
+        unpackResultBob.Value.Message.To = null;
+        unpackResultBob.Value.Metadata.EncryptedTo = null;
+        unpackResultBob.Value.Metadata.SignedMessage = null;
+        unpackResultBob.Value.Metadata.EncryptedTo = null;
+        unpackResultBob.Value.Metadata.SignedMessage = null;
+        unpackResultCharlie.Value.Message.To = null;
+        unpackResultCharlie.Value.Metadata.EncryptedTo = null;
+        unpackResultCharlie.Value.Metadata.SignedMessage = null;
+        unpackResultCharlie.Value.Metadata.EncryptedTo = null;
+        unpackResultCharlie.Value.Metadata.SignedMessage = null;
+        unpackResultBob.Value.Message.Should().BeEquivalentTo(unpackResultCharlie.Value.Message, options => options.Excluding(x => x.Body));
+        unpackResultBob.Value.Metadata.Should().BeEquivalentTo(unpackResultCharlie.Value.Metadata);
     }
 
     [Fact]
@@ -370,9 +370,9 @@ public class DIDCommDemoTest
                 .BuildUnpackParams()
         );
 
-        message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+        message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
     }
 }

@@ -38,15 +38,15 @@ public class SignedMessageTests
             //TODO very much unclear if correctly converted
             Assert.Equal(
                 JWMFixture.PLAINTEXT_MESSAGE.ToString(),
-                unpacked.Message.ToString()
+                unpacked.Value.Message.ToString()
             );
             
-            Assert.Equal(false, unpacked.Metadata.Encrypted);
-            Assert.Equal(true, unpacked.Metadata.Authenticated);
-            Assert.Equal(true, unpacked.Metadata.NonRepudiation);
-            Assert.Equal(false, unpacked.Metadata.AnonymousSender);
-            Assert.Equal(test.expectedMetadata.SignFrom, unpacked.Metadata.SignFrom);
-            Assert.Equal(test.expectedMetadata.SignAlg, unpacked.Metadata.SignAlg);
+            Assert.Equal(false, unpacked.Value.Metadata.Encrypted);
+            Assert.Equal(true, unpacked.Value.Metadata.Authenticated);
+            Assert.Equal(true, unpacked.Value.Metadata.NonRepudiation);
+            Assert.Equal(false, unpacked.Value.Metadata.AnonymousSender);
+            Assert.Equal(test.expectedMetadata.SignFrom, unpacked.Value.Metadata.SignFrom);
+            Assert.Equal(test.expectedMetadata.SignAlg, unpacked.Value.Metadata.SignAlg);
         }
     }
 

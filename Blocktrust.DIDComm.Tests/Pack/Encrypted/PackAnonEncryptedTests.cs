@@ -75,17 +75,17 @@ public class PackAnonEncryptedTests
         var unpackResult = didCommUnpack.Unpack(new UnpackParamsBuilder(
             packedMessage: packResult.PackedMessage).ExpectDecryptByAllKeys(true).BuildUnpackParams());
     
-        Assert.Equal(unpackResult.Message.ToString(), data.Msg.ToString());
+        Assert.Equal(unpackResult.Value.Message.ToString(), data.Msg.ToString());
         Assert.True(
-            unpackResult.Metadata.EncAlgAnon?.CryptAlg == data.Alg.CryptAlg ||
-            unpackResult.Metadata.EncAlgAnon?.CryptAlg == new AnonCryptAlg(AnonCryptAlg.XC20P_ECDH_ES_A256KW).CryptAlg
+            unpackResult.Value.Metadata.EncAlgAnon?.CryptAlg == data.Alg.CryptAlg ||
+            unpackResult.Value.Metadata.EncAlgAnon?.CryptAlg == new AnonCryptAlg(AnonCryptAlg.XC20P_ECDH_ES_A256KW).CryptAlg
         );
     
-        Assert.Null(unpackResult.Metadata.EncAlgAuth);
-        Assert.True(unpackResult.Metadata.AnonymousSender);
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.Equal(unpackResult.Metadata.NonRepudiation, data.SignedFrom != "");
-        Assert.Equal(unpackResult.Metadata.Authenticated, data.SignedFrom != "");
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
+        Assert.Null(unpackResult.Value.Metadata.EncAlgAuth);
+        Assert.True(unpackResult.Value.Metadata.AnonymousSender);
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.Equal(unpackResult.Value.Metadata.NonRepudiation, data.SignedFrom != "");
+        Assert.Equal(unpackResult.Value.Metadata.Authenticated, data.SignedFrom != "");
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
     }
 }

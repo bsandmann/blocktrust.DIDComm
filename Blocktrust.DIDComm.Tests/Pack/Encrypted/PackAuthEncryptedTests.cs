@@ -139,21 +139,21 @@ public class PackAuthEncryptedTests
 
         var expectedAnonAlg = data.ProtectSenderId ? data.AnonAlg : null;
 
-        Assert.Equal(unpackResult.Message.ToString(), data.Msg.ToString());
+        Assert.Equal(unpackResult.Value.Message.ToString(), data.Msg.ToString());
         
         
         Assert.True(
-            unpackResult.Metadata.EncAlgAnon?.CryptAlg == expectedAnonAlg?.CryptAlg ||
-            unpackResult.Metadata.EncAlgAnon?.CryptAlg == new AnonCryptAlg(AnonCryptAlg.XC20P_ECDH_ES_A256KW).CryptAlg
+            unpackResult.Value.Metadata.EncAlgAnon?.CryptAlg == expectedAnonAlg?.CryptAlg ||
+            unpackResult.Value.Metadata.EncAlgAnon?.CryptAlg == new AnonCryptAlg(AnonCryptAlg.XC20P_ECDH_ES_A256KW).CryptAlg
         );
         Assert.True(
-            unpackResult.Metadata.EncAlgAuth?.CryptAlg == data.AuthAlg.CryptAlg ||
-            unpackResult.Metadata.EncAlgAuth?.CryptAlg == new AuthCryptAlg(AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW).CryptAlg
+            unpackResult.Value.Metadata.EncAlgAuth?.CryptAlg == data.AuthAlg.CryptAlg ||
+            unpackResult.Value.Metadata.EncAlgAuth?.CryptAlg == new AuthCryptAlg(AuthCryptAlg.A256CBC_HS512_ECDH_1PU_A256KW).CryptAlg
         );
-        Assert.Equal(unpackResult.Metadata.AnonymousSender, data.ProtectSenderId);
-        Assert.True(unpackResult.Metadata.Encrypted);
-        Assert.Equal(unpackResult.Metadata.NonRepudiation, data.SignedFrom != "");
-        Assert.False(unpackResult.Metadata.ReWrappedInForward);
-        Assert.True(unpackResult.Metadata.Authenticated);
+        Assert.Equal(unpackResult.Value.Metadata.AnonymousSender, data.ProtectSenderId);
+        Assert.True(unpackResult.Value.Metadata.Encrypted);
+        Assert.Equal(unpackResult.Value.Metadata.NonRepudiation, data.SignedFrom != "");
+        Assert.False(unpackResult.Value.Metadata.ReWrappedInForward);
+        Assert.True(unpackResult.Value.Metadata.Authenticated);
     }
 }

@@ -15,7 +15,6 @@ using TestData.Mock;
 
 public class PlaintextMessageTests
 {
-    
     [Fact]
     public void Test_pack_unpack_plaintext_message()
     {
@@ -30,15 +29,15 @@ public class PlaintextMessageTests
         var unpacked = didComm.Unpack(
             new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
         );
-        
+
         var expected = JWMFixture.PLAINTEXT_MESSAGE;
-        
+
         //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
         // Assert.Equivalent(message, unpackResult.message);
-        expected.Should().BeEquivalentTo(unpacked.Message, options => options.Excluding(x => x.Body));
-        expected.Body.Count.Should().Be(unpacked.Message.Body.Count);
-        expected.Body.First().Key.Should().BeEquivalentTo(unpacked.Message.Body.First().Key);
-        expected.Body.First().Value.Should().BeEquivalentTo(unpacked.Message.Body.First().Value?.ToString());
+        expected.Should().BeEquivalentTo(unpacked.Value.Message, options => options.Excluding(x => x.Body));
+        expected.Body.Count.Should().Be(unpacked.Value.Message.Body.Count);
+        expected.Body.First().Key.Should().BeEquivalentTo(unpacked.Value.Message.Body.First().Key);
+        expected.Body.First().Value.Should().BeEquivalentTo(unpacked.Value.Message.Body.First().Value?.ToString());
     }
 
     [Fact]
@@ -62,16 +61,16 @@ public class PlaintextMessageTests
                 new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
             );
 
-            Assert.Equivalent("did:example:alice#key-2", unpackResult.Metadata.FromPriorIssuerKid);
+            Assert.Equivalent("did:example:alice#key-2", unpackResult.Value.Metadata.FromPriorIssuerKid);
             Assert.Equal(
                 JObject.Parse(packResult.PackedMessage)["from_prior"]?.ToString(),
-                unpackResult.Metadata.FromPriorJwt);
-            // Assert.Equivalent(message, unpackResult.message);
+                unpackResult.Value.Metadata.FromPriorJwt);
+            // Assert.Equivalent(message, unpackResult.Value.Message);
             //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
-            message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-            message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-            message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-            message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
+            message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+            message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+            message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+            message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
         }
     }
 
@@ -98,14 +97,14 @@ public class PlaintextMessageTests
             );
 
             //TODO
-            message.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-            message.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-            message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-            message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-            Assert.Equal(packResult.FromPriorIssuerKid, unpackResult.Metadata.FromPriorIssuerKid);
+            message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+            message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+            message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+            message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+            Assert.Equal(packResult.FromPriorIssuerKid, unpackResult.Value.Metadata.FromPriorIssuerKid);
             Assert.Equal(
                 JObject.Parse(packResult.PackedMessage)["from_prior"],
-                unpackResult.Metadata.FromPriorJwt
+                unpackResult.Value.Metadata.FromPriorJwt
             );
         }
     }
@@ -132,14 +131,14 @@ public class PlaintextMessageTests
         );
 
         //TODO
-        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Should().BeEquivalentTo(unpackResult.Message, options => options.Excluding(x => x.Body));
-        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.Count.Should().Be(unpackResult.Message.Body.Count);
-        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.First().Key.Should().BeEquivalentTo(unpackResult.Message.Body.First().Key);
-        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.First().Value.Should().BeEquivalentTo(unpackResult.Message.Body.First().Value?.ToString());
-        Assert.Equal("did:example:alice#key-1", unpackResult.Metadata.FromPriorIssuerKid);
+        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));
+        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
+        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
+        JWMFixture.PLAINTEXT_MESSAGE_FROM_PRIOR.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
+        Assert.Equal("did:example:alice#key-1", unpackResult.Value.Metadata.FromPriorIssuerKid);
         Assert.Equal(
             JObject.Parse(JWMFixture.PACKED_MESSAGE_FROM_PRIOR)["from_prior"],
-            unpackResult.Metadata.FromPriorJwt
+            unpackResult.Value.Metadata.FromPriorJwt
         );
     }
 
@@ -150,13 +149,12 @@ public class PlaintextMessageTests
 
         foreach (var tv in JWMFixture.WRONG_FROM_PRIOR_PACKED_MESSAGES)
         {
-            var thrown = Assert.Throws<MalformedMessageException>(() =>
-                didComm.Unpack(
-                    new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
-                )
+            var result = didComm.Unpack(
+                new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
             );
 
-            Assert.Contains(tv.ExpectedMessage, thrown.Message);
+            Assert.False(result.IsSuccess);
+            Assert.Contains(tv.ExpectedMessage, result.Errors.First().Message);
         }
     }
 
@@ -165,38 +163,37 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        var thrown = Assert.Throws<MalformedMessageException>(() =>
-            didComm.Unpack(
-                new UnpackParamsBuilder(JWMFixture.PACKED_MESSAGE_WITHOUT_BODY).BuildUnpackParams()
-            )
+        var result = didComm.Unpack(
+            new UnpackParamsBuilder(JWMFixture.PACKED_MESSAGE_WITHOUT_BODY).BuildUnpackParams()
         );
 
-        Assert.Contains("The header \"body\" is missing", thrown.Message);
+            Assert.False(result.IsSuccess);
+        Assert.Contains("The header \"body\" is missing", result.Errors.First().Message);
     }
 
     [Fact]
     public void Test_plaintext_custom_body_with_jackson()
     {
-        var body = new Dictionary<string, object>() { { "some","content" } };
-        
+        var body = new Dictionary<string, object>() { { "some", "content" } };
+
         var message = Message.Builder("1", body, "protocol")
             .createdTime(1)
             .expiresTime(2)
             .build();
-        
+
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
-        
+
         var packed = didComm.PackPlaintext(
             new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
         );
-        
+
         Assert.NotNull(packed.PackedMessage);
-        
+
         var unpacked = didComm.Unpack(
             new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
         );
-        
-        var unpackedBody = unpacked.Message.Body;
+
+        var unpackedBody = unpacked.Value.Message.Body;
         var unpackedProtocolMessage = unpackedBody["some"];
         Assert.Equal(body["some"].ToString(), ((JsonElement)(unpackedProtocolMessage ?? throw new InvalidOperationException())).GetString());
     }
@@ -224,15 +221,15 @@ public class PlaintextMessageTests
             new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
         );
 
-        Assert.Null(unpacked.Message.CustomHeader<object>("null"));
-        Assert.Equal(2L, unpacked.Message.CustomHeader<long>("int"));
-        Assert.Equal("Hello, world", unpacked.Message.CustomHeader<string>("string"));
-        Assert.True(unpacked.Message.CustomHeader<bool?>("booleanTrue") ?? false);
-        Assert.False(unpacked.Message.CustomHeader<bool?>("booleanFalse") ?? true);
-        var obj = unpacked.Message.CustomHeaderObject("object");
+        Assert.Null(unpacked.Value.Message.CustomHeader<object>("null"));
+        Assert.Equal(2L, unpacked.Value.Message.CustomHeader<long>("int"));
+        Assert.Equal("Hello, world", unpacked.Value.Message.CustomHeader<string>("string"));
+        Assert.True(unpacked.Value.Message.CustomHeader<bool?>("booleanTrue") ?? false);
+        Assert.False(unpacked.Value.Message.CustomHeader<bool?>("booleanFalse") ?? true);
+        var obj = unpacked.Value.Message.CustomHeaderObject("object");
         var objContent = (JsonElement)obj!["foo"];
         Assert.Equal("bar", objContent.GetString()!);
-        Assert.Equal(new List<long> { 1, 2, 3, 4, 5 }, unpacked.Message.CustomHeader<List<long>>("array"));
+        Assert.Equal(new List<long> { 1, 2, 3, 4, 5 }, unpacked.Value.Message.CustomHeader<List<long>>("array"));
     }
 
     [Fact]
@@ -255,14 +252,12 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        var thrown = Assert.Throws<MalformedMessageException>(() =>
-        {
-            didComm.Unpack(
-                new UnpackParamsBuilder("{}").BuildUnpackParams()
-            );
-        });
+        var result = didComm.Unpack(
+            new UnpackParamsBuilder("{}").BuildUnpackParams()
+        );
 
-        Assert.Contains("The header \"id\" is missing", thrown.Message);
+        Assert.False(result.IsSuccess);
+        Assert.Contains("The header \"id\" is missing", result.Errors.First().Message);
     }
 
     [Fact]
@@ -272,14 +267,12 @@ public class PlaintextMessageTests
 
         foreach (var tv in JWMFixture.WRONG_ATTACHMENTS)
         {
-            var thrown = Assert.Throws<MalformedMessageException>(() =>
-            {
-                didComm.Unpack(
-                    new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
-                );
-            });
+            var result = didComm.Unpack(
+                new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
+            );
 
-            Assert.Contains(tv.ExpectedMessage, thrown.Message);
+            Assert.False(result.IsSuccess);
+            Assert.Contains(tv.ExpectedMessage, result.Errors.First().Message);
         }
     }
 
@@ -288,13 +281,13 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-            foreach (var tv in JWMFixture.CORRECT_ATTACHMENTS)
+        foreach (var tv in JWMFixture.CORRECT_ATTACHMENTS)
         {
             var unpack = didComm.Unpack(
                 new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
             );
 
-            var actual = unpack.Message.Attachments
+            var actual = unpack.Value.Message.Attachments
                 ?.Select(it => it.Data)
                 ?.Select(it =>
                     new ExpectedAttachmentData(
@@ -341,7 +334,7 @@ public class PlaintextMessageTests
                 .ByteCount(1L)
                 .Build()
         };
-        
+
         var body = new Dictionary<string, object>
         {
             {
@@ -391,27 +384,27 @@ public class PlaintextMessageTests
             new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
         );
 
-        Assert.Equivalent(message.FromPrior, unpack.Message.FromPrior);
+        Assert.Equivalent(message.FromPrior, unpack.Value.Message.FromPrior);
         //TODO the usaul problem with jsonelement
         // Assert.Equivalent(message.Attachments.First(), unpack.message.Attachments.First());
-        message.Attachments.First().Should().BeEquivalentTo(unpack.Message.Attachments.First(), options => options.Excluding(x => x.Data.Jws));
-        message.Attachments.Count.Should().Be(unpack.Message.Attachments.Count);
-        message.Attachments.First().Data.Jws["payload"].Should().BeEquivalentTo(unpack.Message.Attachments.First().Data.Jws["payload"].ToString());
-        message.Attachments.First().Data.Jws["signature"].Should().BeEquivalentTo(unpack.Message.Attachments.First().Data.Jws["signature"].ToString());
+        message.Attachments.First().Should().BeEquivalentTo(unpack.Value.Message.Attachments.First(), options => options.Excluding(x => x.Data.Jws));
+        message.Attachments.Count.Should().Be(unpack.Value.Message.Attachments.Count);
+        message.Attachments.First().Data.Jws["payload"].Should().BeEquivalentTo(unpack.Value.Message.Attachments.First().Data.Jws["payload"].ToString());
+        message.Attachments.First().Data.Jws["signature"].Should().BeEquivalentTo(unpack.Value.Message.Attachments.First().Data.Jws["signature"].ToString());
 
 
         Assert.Equal(
             message.Body["first"].ToString(),
-            unpack.Message.Body.GetTyped<string>("first").ToString()
+            unpack.Value.Message.Body.GetTyped<string>("first").ToString()
         );
 
         Assert.Equal(
             message.Body.GetTyped<string>("second"),
-            unpack.Message.Body.GetTyped<string>("second")
+            unpack.Value.Message.Body.GetTyped<string>("second")
         );
 
         var expectedObject = message.Body["object"] as Dictionary<string, object>;
-        var actualObject = unpack.Message.Body.GetTyped<Dictionary<string, object>>("object");
+        var actualObject = unpack.Value.Message.Body.GetTyped<Dictionary<string, object>>("object");
 
         Assert.NotNull(expectedObject);
         Assert.NotNull(actualObject);
@@ -428,22 +421,22 @@ public class PlaintextMessageTests
 
         // var expectedArray = message.Body.GetTyped<List<object>>("array")?.ToArray();
         var expectedArray = message.Body["array"] as List<object>;
-        var actualArray = unpack.Message.Body.GetTypedArray<object>("array");
+        var actualArray = unpack.Value.Message.Body.GetTypedArray<object>("array");
         //TODO nasty. The same old json problem
         //TODO im to lazy to compare it here in the tests
         // Assert.Equivalent(expectedArray[0], actualArray[0][0].ToString());
-        Assert.Equal(message.From, unpack.Message.From);
-        Assert.Equal(message.CreatedTime, unpack.Message.CreatedTime);
-        Assert.Equal(message.ExpiresTime, unpack.Message.ExpiresTime);
-        Assert.Equal(message.PleaseAck, unpack.Message.PleaseAck);
-        Assert.Equal(message.Ack, unpack.Message.Ack);
-        Assert.Equal(message.Thid, unpack.Message.Thid);
-        Assert.Equal(message.Pthid, unpack.Message.Pthid);
-        Assert.Equivalent(message.To, unpack.Message.To);
+        Assert.Equal(message.From, unpack.Value.Message.From);
+        Assert.Equal(message.CreatedTime, unpack.Value.Message.CreatedTime);
+        Assert.Equal(message.ExpiresTime, unpack.Value.Message.ExpiresTime);
+        Assert.Equal(message.PleaseAck, unpack.Value.Message.PleaseAck);
+        Assert.Equal(message.Ack, unpack.Value.Message.Ack);
+        Assert.Equal(message.Thid, unpack.Value.Message.Thid);
+        Assert.Equal(message.Pthid, unpack.Value.Message.Pthid);
+        Assert.Equivalent(message.To, unpack.Value.Message.To);
 
         Assert.Equal(
             message.CustomHeaders["foo"],
-            unpack.Message.CustomHeader<string>("foo")
+            unpack.Value.Message.CustomHeader<string>("foo")
         );
 
         //TODO nasty json shit

@@ -5,13 +5,14 @@ using Crypto.JWM;
 using Crypto.JWS;
 using Crypto.Keys;
 using Exceptions;
+using FluentResults;
 using Message.Messages;
 using Model.UnpackParamsModels;
 using Model.UnpackResultModels;
 
 public class Unpacker
 {
-    public static UnpackResult Unpack(UnpackParams param, RecipientKeySelector keySelector)
+    public static Result<UnpackResult> Unpack(UnpackParams param, RecipientKeySelector keySelector)
     {
         try
         {
@@ -24,11 +25,11 @@ public class Unpacker
                 param.ExpectDecryptByAllKeys,
                 param.UnwrapReWrappingForward
             );
-            return new UnpackResult(msg, metadataBuilder.BuildUnpackResult());
+            return Result.Ok(new UnpackResult(msg, metadataBuilder.BuildUnpackResult()));
         }
         catch (Exception e)
         {
-            throw new MalformedMessageException($"Message cannot be parsed: {e.Message}");
+            return Result.Fail($"Message cannot be parsed: {e.Message}");
         }
     }
 
