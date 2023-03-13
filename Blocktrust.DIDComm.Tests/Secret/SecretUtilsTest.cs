@@ -41,7 +41,7 @@ public class SecretUtilsTest
         var secret = SecretUtils.JwkToSecret(keys.PrivateKey);
         Assert.Equal(VerificationMethodType.JsonWebKey2020, secret.Type);
         Assert.Equal(keys.PrivateKey["kid"], secret.Kid);
-        Assert.Equal(VerificationMaterialFormat.Jwk, secret.VerificationMaterial.format);
+        Assert.Equal(VerificationMaterialFormat.Jwk, secret.VerificationMaterial.Format);
     }
 
     [Fact]

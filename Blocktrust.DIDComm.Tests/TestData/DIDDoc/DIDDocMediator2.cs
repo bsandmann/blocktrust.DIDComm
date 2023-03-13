@@ -12,8 +12,8 @@ public class DIDDocMediator2
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
             {
                 "kty": "OKP",
                 "crv": "X25519",
@@ -30,8 +30,8 @@ public class DIDDocMediator2
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
             {
                 "kty": "EC",
                 "crv": "P-256",
@@ -49,8 +49,8 @@ public class DIDDocMediator2
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
             {
                 "kty": "EC",
                 "crv": "P-384",
@@ -68,8 +68,8 @@ public class DIDDocMediator2
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
         {
             "kty": "EC",
             "crv": "P-521",

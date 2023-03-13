@@ -13,8 +13,8 @@ public class Mediator1SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                 {
                     "kty": "OKP",
                     "d": "b9NnuOCB0hm7YGNvaE9DMhwH_wjZA1-gWD6dA0JWdL0",
@@ -29,8 +29,8 @@ public class Mediator1SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value ="""
+                Format = VerificationMaterialFormat.Jwk,
+                Value ="""
                 {
                     "kty": "EC",
                     "d": "PgwHnlXxt8pwR6OCTUwwWx-P51BiLkFZyqHzquKddXQ",
@@ -47,8 +47,8 @@ public class Mediator1SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                 {
                     "kty": "EC",
                     "d": "ajqcWbYA0UDBKfAhkSkeiVjMMt8l-5rcknvEv9t_Os6M8s-HisdywvNCX4CGd_xY",
@@ -64,8 +64,8 @@ public class Mediator1SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                 {
                     "kty": "EC",
                     "d": "AV5ocjvy7PkPgNrSuvCxtG70NMj6iTabvvjSLbsdd8OdI9HlXYlFR7RdBbgLUTruvaIRhjEAE9gNTH6rWUIdfuj6",

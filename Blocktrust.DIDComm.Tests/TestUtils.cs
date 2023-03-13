@@ -125,7 +125,7 @@ public static class TestUtils
     {
         if (
             vm.Type == VerificationMethodType.JsonWebKey2020 &&
-            vm.VerificationMaterial.format == VerificationMaterialFormat.Jwk
+            vm.VerificationMaterial.Format == VerificationMaterialFormat.Jwk
         )
         {
             var jwk = ParseJwk(vm.VerificationMaterial);
@@ -152,7 +152,7 @@ public static class TestUtils
     {
         if (
             vm.Type == VerificationMethodType.JsonWebKey2020 &&
-            vm.VerificationMaterial.format == VerificationMaterialFormat.Jwk
+            vm.VerificationMaterial.Format == VerificationMaterialFormat.Jwk
         )
         {
             var jwk = ParseJwk(vm.VerificationMaterial);
@@ -177,9 +177,9 @@ public static class TestUtils
 
     private static Jwk ParseJwk(VerificationMaterial verificationMaterial)
     {
-        if (verificationMaterial.format == VerificationMaterialFormat.Jwk)
+        if (verificationMaterial.Format == VerificationMaterialFormat.Jwk)
         {
-            var deserialized = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(verificationMaterial.value);
+            var deserialized = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(verificationMaterial.Value);
             var dict = new Dictionary<string, object>();
             foreach (var kvpair in deserialized)
             {

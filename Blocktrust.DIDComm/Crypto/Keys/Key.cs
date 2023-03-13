@@ -38,20 +38,20 @@ public interface Key
         switch (method.Type)
         {
             case VerificationMethodType.JsonWebKey2020:
-                if (method.VerificationMaterial.format != VerificationMaterialFormat.Jwk)
+                if (method.VerificationMaterial.Format != VerificationMaterialFormat.Jwk)
                     throw new UnsupportedVerificationMethodMaterialFormatException(
-                        method.VerificationMaterial.format, method.Type
+                        method.VerificationMaterial.Format, method.Type
                     );
-                return new JsonWebKey(method.Id, method.VerificationMaterial.value);
+                return new JsonWebKey(method.Id, method.VerificationMaterial.Value);
 
             case VerificationMethodType.X25519KeyAgreementKey2019:
                 // throw new UnsupportedVerificationMethodTypeException(method.type);
             case VerificationMethodType.Ed25519VerificationKey2018:
             {
                 //TODO somwaht unclear waht all this is. Can be simplified ist if implementeted X25519
-                if (method.VerificationMaterial.format != VerificationMaterialFormat.Base58)
+                if (method.VerificationMaterial.Format != VerificationMaterialFormat.Base58)
                     throw new UnsupportedVerificationMethodMaterialFormatException(
-                        method.VerificationMaterial.format, method.Type
+                        method.VerificationMaterial.Format, method.Type
                     );
                 string curve;
                 switch ((method.Type))
@@ -67,7 +67,7 @@ public interface Key
                         throw new UnsupportedVerificationMethodTypeException(method.Type);
                 }
 
-                return new Base58PublicKey(method.Id, curve, method.VerificationMaterial.value);
+                return new Base58PublicKey(method.Id, curve, method.VerificationMaterial.Value);
             }
 
             case VerificationMethodType.X25519KeyAgreementKey2020:
@@ -75,9 +75,9 @@ public interface Key
             case VerificationMethodType.Ed25519VerificationKey2020:
             {
                 //TODO somwaht unclear waht all this is. Cann be simplified when implemtende x25519
-                if (method.VerificationMaterial.format != VerificationMaterialFormat.Multibase)
+                if (method.VerificationMaterial.Format != VerificationMaterialFormat.Multibase)
                     throw new UnsupportedVerificationMethodMaterialFormatException(
-                        method.VerificationMaterial.format, method.Type
+                        method.VerificationMaterial.Format, method.Type
                     );
                 string curve;
                 switch ((method.Type))
@@ -93,7 +93,7 @@ public interface Key
                         throw new UnsupportedVerificationMethodTypeException(method.Type);
                 }
 
-                return new MultibasePublicKey(method.Id, curve, method.VerificationMaterial.value);
+                return new MultibasePublicKey(method.Id, curve, method.VerificationMaterial.Value);
             }
 
             default:
@@ -108,17 +108,17 @@ public interface Key
         switch (secret.Type)
         {
             case VerificationMethodType.JsonWebKey2020:
-                if (secret.VerificationMaterial.format != VerificationMaterialFormat.Jwk)
+                if (secret.VerificationMaterial.Format != VerificationMaterialFormat.Jwk)
                     throw new UnsupportedSecretMaterialFormatException(
-                        secret.VerificationMaterial.format, secret.Type
+                        secret.VerificationMaterial.Format, secret.Type
                     );
-                return new JsonWebKey(secret.Kid, secret.VerificationMaterial.value);
+                return new JsonWebKey(secret.Kid, secret.VerificationMaterial.Value);
 
             case VerificationMethodType.X25519KeyAgreementKey2019:
             case VerificationMethodType.Ed25519VerificationKey2018:
-                if (secret.VerificationMaterial.format != VerificationMaterialFormat.Base58)
+                if (secret.VerificationMaterial.Format != VerificationMaterialFormat.Base58)
                     throw new UnsupportedSecretMaterialFormatException(
-                        secret.VerificationMaterial.format, secret.Type
+                        secret.VerificationMaterial.Format, secret.Type
                     );
                 string curve_2018_2019;
                 switch (secret.Type)
@@ -134,13 +134,13 @@ public interface Key
                         throw new UnsupportedSecretTypeException(secret.Type);
                 }
 
-                return new Base58PrivateKey(secret.Kid, curve_2018_2019, secret.VerificationMaterial.value);
+                return new Base58PrivateKey(secret.Kid, curve_2018_2019, secret.VerificationMaterial.Value);
 
             case VerificationMethodType.X25519KeyAgreementKey2020:
             case VerificationMethodType.Ed25519VerificationKey2020:
-                if (secret.VerificationMaterial.format != VerificationMaterialFormat.Multibase)
+                if (secret.VerificationMaterial.Format != VerificationMaterialFormat.Multibase)
                     throw new UnsupportedSecretMaterialFormatException(
-                        secret.VerificationMaterial.format, secret.Type
+                        secret.VerificationMaterial.Format, secret.Type
                     );
                 string curve_2020;
                 switch (secret.Type)
@@ -156,7 +156,7 @@ public interface Key
                         throw new UnsupportedSecretTypeException(secret.Type);
                 }
 
-                return new MultibasePrivateKey(secret.Kid, curve_2020, secret.VerificationMaterial.value);
+                return new MultibasePrivateKey(secret.Kid, curve_2020, secret.VerificationMaterial.Value);
 
             default:
                 throw new UnsupportedSecretTypeException(secret.Type);

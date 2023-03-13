@@ -13,8 +13,8 @@ public class Mediator2SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                     {
                         "kty": "OKP",
                         "d": "p-vteoF1gopny1HXywt76xz_uC83UUmrgszsI-ThBKk",
@@ -29,8 +29,8 @@ public class Mediator2SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                             "kty": "EC",
                             "d": "agKz7HS8mIwqO40Q2dwm_Zi70IdYFtonN5sZecQoxYU",
@@ -47,8 +47,8 @@ public class Mediator2SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                             "kty": "EC",
                             "d": "OiwhRotK188BtbQy0XBO8PljSKYI6CCD-nE_ZUzK7o81tk3imDOuQ-jrSWaIkI-T",
@@ -64,8 +64,8 @@ public class Mediator2SecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                             "kty": "EC",
                             "d": "ABixMEZHsyT7SRw-lY5HxdNOofTZLlwBHwPEJ3spEMC2sWN1RZQylZuvoyOBGJnPxg4-H_iVhNWf_OtgYODrYhCk",

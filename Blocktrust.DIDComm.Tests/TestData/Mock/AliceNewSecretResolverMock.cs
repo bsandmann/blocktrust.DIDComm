@@ -13,8 +13,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"OKP",
                            "d":"pFRUKkyzx4kHdJtFSnlPA9WzqkDT1HWV0xZ5OYZd2SY",
@@ -29,8 +29,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =   """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =   """
                         {
                            "kty":"EC",
                            "d":"7TCIdt1rhThFtWcEiLnk_COEjh1ZfQhM4bW2wz-dp4A",
@@ -46,8 +46,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =  """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =  """
                         {
                            "kty":"EC",
                            "d":"N3Hm1LXA210YVGGsXw_GklMwcLu_bMgnzDese6YQIyA",
@@ -63,8 +63,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"OKP",
                            "d":"r-jK2cO3taR8LQnJB1_ikLBTAnOtShJOsHXRUWT-aZA",
@@ -79,8 +79,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"sB0bYtpaXyp-h17dDpMx91N3Du1AdN4z1FUq02GbmLw",
@@ -96,8 +96,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"AQCQKE7rZpxPnX9RgjXxeywrAMp1fJsyFe4cir1gWj-8t8xWaM_E2qBkTTzyjbRBu-JPXHe_auT850iYmE34SkWi",
@@ -113,8 +113,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"OKP",
                            "d":"Z-BsgFe-eCvhuZlCBX5BV2XiDE2M92gkaORCe68YdZI",
@@ -129,8 +129,8 @@ public class AliceNewSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"OKP",
                            "d":"T2azVap7CYD_kB8ilbnFYqwwYb5N-GcD6yjGEvquZXg",

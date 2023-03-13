@@ -25,7 +25,7 @@ public class SecretUtils
 
     public static Dictionary<string, object> SecretToJwk(Secret secret)
     {
-        return JsonSerializer.Deserialize<Dictionary<string, object>>(secret.VerificationMaterial.value);
+        return JsonSerializer.Deserialize<Dictionary<string, object>>(secret.VerificationMaterial.Value);
     }
 
 

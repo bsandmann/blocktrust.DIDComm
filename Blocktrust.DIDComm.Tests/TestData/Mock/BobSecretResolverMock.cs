@@ -13,8 +13,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =  """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =  """
                         {
                            "kty":"OKP",
                            "d":"b9NnuOCB0hm7YGNvaE9DMhwH_wjZA1-gWD6dA0JWdL0",
@@ -29,8 +29,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =    """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =    """
                         {
                            "kty":"OKP",
                            "d":"p-vteoF1gopny1HXywt76xz_uC83UUmrgszsI-ThBKk",
@@ -45,8 +45,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =  """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =  """
                         {
                            "kty":"OKP",
                            "d":"f9WJeuQXEItkGM8shN4dqFr5fLQLBasHnWZ-8dPaSo0",
@@ -61,8 +61,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"PgwHnlXxt8pwR6OCTUwwWx-P51BiLkFZyqHzquKddXQ",
@@ -78,8 +78,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"agKz7HS8mIwqO40Q2dwm_Zi70IdYFtonN5sZecQoxYU",
@@ -95,8 +95,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"ajqcWbYA0UDBKfAhkSkeiVjMMt8l-5rcknvEv9t_Os6M8s-HisdywvNCX4CGd_xY",
@@ -112,8 +112,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =  """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =  """
                         {
                            "kty":"EC",
                            "d":"OiwhRotK188BtbQy0XBO8PljSKYI6CCD-nE_ZUzK7o81tk3imDOuQ-jrSWaIkI-T",
@@ -129,8 +129,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value = """
+                Format = VerificationMaterialFormat.Jwk,
+                Value = """
                         {
                            "kty":"EC",
                            "d":"AV5ocjvy7PkPgNrSuvCxtG70NMj6iTabvvjSLbsdd8OdI9HlXYlFR7RdBbgLUTruvaIRhjEAE9gNTH6rWUIdfuj6",
@@ -146,8 +146,8 @@ public class BobSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =   """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =   """
                         {
                            "kty":"EC",
                            "d":"ABixMEZHsyT7SRw-lY5HxdNOofTZLlwBHwPEJ3spEMC2sWN1RZQylZuvoyOBGJnPxg4-H_iVhNWf_OtgYODrYhCk",

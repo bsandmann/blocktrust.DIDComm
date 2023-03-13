@@ -13,8 +13,8 @@ public class CharlieSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =  """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =  """
                         {
                            "kty":"OKP",
                            "d":"Z-BsgFe-eCvhuZlCBX5BV2XiDE2M92gkaORCe68YdZI",
@@ -29,8 +29,8 @@ public class CharlieSecretResolverMock : SecretResolverInMemoryMock
             type: VerificationMethodType.JsonWebKey2020,
             verificationMaterial: new VerificationMaterial()
             {
-                format = VerificationMaterialFormat.Jwk,
-                value =    """
+                Format = VerificationMaterialFormat.Jwk,
+                Value =    """
                         {
                            "kty":"OKP",
                            "d":"Z-BsgFe-eCvhuZlCBX5BV2XiDE2M92gkaORCe68YdZI",
