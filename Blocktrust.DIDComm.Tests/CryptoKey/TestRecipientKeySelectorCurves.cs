@@ -20,14 +20,14 @@ public class TestRecipientKeySelectorCurves
 
     [Theory]
     [MemberData(nameof(TestRecipientKeySelectorDifferentCurves))]
-    public void Test_find_anoncrypt_unpack_recipient_private_keys_positive_multiple_keys(DifferentCurveTypesTestData data)
+    public async Task Test_find_anoncrypt_unpack_recipient_private_keys_positive_multiple_keys(DifferentCurveTypesTestData data)
     {
         var keySelector = new RecipientKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
     
         var secrets = TestUtils.GetKeyAgreementSecrets(TestUtils.Person.BOB, data.CurveType);
         var toKids = secrets.Select(s => s.Kid).ToList();
     
-        var res = keySelector.FindAnonCryptKeys(toKids).Select(it => it.Jwk).ToList();
+        var res = (await keySelector.FindAnonCryptKeys(toKids)).Select(it => it.Jwk).ToList();
     
         var keySecrets = secrets.Select(s => Key.FromSecret(s).Jwk);
         Assert.Equivalent(keySecrets, res);
@@ -35,18 +35,18 @@ public class TestRecipientKeySelectorCurves
     
     [Theory]
     [MemberData(nameof(TestRecipientKeySelectorDifferentCurves))]
-    public void Test_find_anoncrypt_unpack_recipient_private_keys_all_not_in_secrets(DifferentCurveTypesTestData data)
+    public async Task Test_find_anoncrypt_unpack_recipient_private_keys_all_not_in_secrets(DifferentCurveTypesTestData data)
     {
         var keySelector = new RecipientKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
     
         var notInSecretKids = TestUtils.GetKeyAgreementMethodsNotInSecrets(TestUtils.Person.BOB, data.CurveType).Select(vm => vm.Id).ToList();
-    
-        Assert.Throws<SecretNotFoundException>(() => keySelector.FindAnonCryptKeys(notInSecretKids));
+
+        await Assert.ThrowsAsync<SecretNotFoundException>(async () => await keySelector.FindAnonCryptKeys(notInSecretKids));
     }
     
     [Theory]
     [MemberData(nameof(TestRecipientKeySelectorDifferentCurves))]
-    public void test_find_anoncrypt_unpack_recipient_private_keys_known_and_unknown(DifferentCurveTypesTestData data)
+    public async Task test_find_anoncrypt_unpack_recipient_private_keys_known_and_unknown(DifferentCurveTypesTestData data)
     {
         var keySelector = new RecipientKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
     
@@ -54,7 +54,7 @@ public class TestRecipientKeySelectorCurves
         var validKids = secrets.Select(s => s.Kid);
         var toKids = new List<string> { "did:example:unknown1#key-1", $"{JWMFixture.BOB_DID}#unknown-key-2" }.Concat(validKids).ToList();
     
-        var res = keySelector.FindAnonCryptKeys(toKids).Select(it => it.Jwk).ToList();
+        var res = (await keySelector.FindAnonCryptKeys(toKids)).Select(it => it.Jwk).ToList();
     
         var keySecrets = secrets.Select(s => Key.FromSecret(s).Jwk);
         Assert.Equivalent(keySecrets, res);
@@ -62,7 +62,7 @@ public class TestRecipientKeySelectorCurves
     
     [Theory]
     [MemberData(nameof(TestRecipientKeySelectorDifferentCurves))]
-    public void test_find_anoncrypt_unpack_recipient_private_keys_in_secrets_and_not(DifferentCurveTypesTestData data)
+    public async Task test_find_anoncrypt_unpack_recipient_private_keys_in_secrets_and_not(DifferentCurveTypesTestData data)
     {
         var keySelector = new RecipientKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
     
@@ -71,7 +71,7 @@ public class TestRecipientKeySelectorCurves
         var notInSecretKids = TestUtils.GetKeyAgreementMethodsNotInSecrets(TestUtils.Person.BOB, data.CurveType).Select(s => s.Id);
         var kids = notInSecretKids.Concat(validKids).ToList();
     
-        var res = keySelector.FindAnonCryptKeys(kids).Select(it => it.Jwk).ToList();
+        var res = (await keySelector.FindAnonCryptKeys(kids)).Select(it => it.Jwk).ToList();
     
         var keySecrets = secrets.Select(s => Key.FromSecret(s).Jwk).ToList();
         Assert.Equivalent(res, keySecrets);

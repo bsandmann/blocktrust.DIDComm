@@ -12,13 +12,13 @@ using Model.UnpackResultModels;
 
 public class Unpacker
 {
-    public static Result<UnpackResult> Unpack(UnpackParams param, RecipientKeySelector keySelector)
+    public static async Task<Result<UnpackResult>> Unpack(UnpackParams param, RecipientKeySelector keySelector)
     {
         try
         {
             var packedMessage = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(param.PackedMessage);
             var metadataBuilder = new UnpackResultBuilder();
-            var msg = Unpack(
+            var msg = await Unpack(
                 packedMessage,
                 keySelector,
                 metadataBuilder,
@@ -33,7 +33,7 @@ public class Unpacker
         }
     }
 
-    public static Message Unpack(
+    public static async Task<Message> Unpack(
         Dictionary<string, object?> packedMessage,
         RecipientKeySelector keySelector,
         UnpackResultBuilder metadataUnpackResultBuilder,
@@ -43,15 +43,15 @@ public class Unpacker
         var parseResult = JwmParseResult.Parse(packedMessage);
         if (parseResult is JwsParseResult)
         {
-            return Jws.Unpack(((JwsParseResult)parseResult), keySelector, metadataUnpackResultBuilder);
+            return await Jws.Unpack(((JwsParseResult)parseResult), keySelector, metadataUnpackResultBuilder);
         }
         else if (parseResult is JweParseResult)
         {
-            return JweExtensions.Unpack((JweParseResult)parseResult, keySelector, expectDecryptByAllKeys, metadataUnpackResultBuilder, unwrapReWrappingForward).Item1;
+            return (await JweExtensions.Unpack((JweParseResult)parseResult, keySelector, expectDecryptByAllKeys, metadataUnpackResultBuilder, unwrapReWrappingForward)).Item1;
         }
         else if (parseResult is JwmParseResult)
         {
-            return JwmExtensions.Unpack((JwmParseResult)parseResult, keySelector, metadataUnpackResultBuilder);
+            return await JwmExtensions.Unpack((JwmParseResult)parseResult, keySelector, metadataUnpackResultBuilder);
         }
 
         throw new Exception("Unable to unpack message");

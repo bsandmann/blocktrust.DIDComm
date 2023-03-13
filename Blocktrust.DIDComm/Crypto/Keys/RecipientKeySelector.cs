@@ -16,7 +16,7 @@ public class RecipientKeySelector
         this._secretResolver = secretResolver;
     }
 
-    public Key FindVerificationKey(string signFrom)
+    public async Task<Key> FindVerificationKey(string signFrom)
     {
         if (!DidUtils.IsDidFragment(signFrom))
         {
@@ -25,7 +25,7 @@ public class RecipientKeySelector
 
         var did = DidUtils.DivideDidFragment(signFrom);
 
-        var didDoc = _ididDocResolver.Resolve(did.First());
+        var didDoc = await _ididDocResolver.Resolve(did.First());
         if (didDoc == null)
         {
             throw new DidUrlNotFoundException(signFrom, did.First());
@@ -34,7 +34,7 @@ public class RecipientKeySelector
         return Key.FromVerificationMethod(didDoc.FindVerificationMethod(signFrom));
     }
 
-    public (Key, List<Key>) FindAuthCryptKeys(string from, List<string> to)
+    public async Task<(Key, List<Key>)> FindAuthCryptKeys(string from, List<string> to)
     {
         if (!DidUtils.IsDidFragment(from))
         {
@@ -44,7 +44,7 @@ public class RecipientKeySelector
         var did = DidUtils.DivideDidFragment(from);
 
         //TODO modified
-        var didDoc = _ididDocResolver.Resolve(did.First());
+        var didDoc = await _ididDocResolver.Resolve(did.First());
         if (didDoc == null)
         {
             //TODO modified
@@ -53,19 +53,19 @@ public class RecipientKeySelector
 
         var verificationMethod = didDoc.FindVerificationMethod(from);
         var senderKey = Key.FromVerificationMethod(verificationMethod);
-        var recipientKeys = FindRecipientKeys(to, senderKey.Curve);
+        var recipientKeys = await FindRecipientKeys(to, senderKey.Curve);
 
         return (senderKey, recipientKeys);
     }
 
-    public bool HasKeysForForwardNext(string next)
+    public async Task<bool> HasKeysForForwardNext(string next)
     {
-        var nextKids = DidUtils.IsDidFragment(next) ? new List<string> { next } : _ididDocResolver.Resolve(next)?.KeyAgreements ?? new List<string>();
+        var nextKids = DidUtils.IsDidFragment(next) ? new List<string> { next } : (await _ididDocResolver.Resolve(next))?.KeyAgreements ?? new List<string>();
 
-        return _secretResolver.FindKeys(nextKids).Any();
+        return (await _secretResolver.FindKeys(nextKids)).Any();
     }
 
-    public IEnumerable<Key> FindAnonCryptKeys(List<string> to)
+    public async Task<IEnumerable<Key>> FindAnonCryptKeys(List<string> to)
     {
         foreach (var recipient in to)
         {
@@ -75,30 +75,33 @@ public class RecipientKeySelector
             }
         }
 
-        return FindRecipientKeys(to, null);
+        return await FindRecipientKeys(to, null);
     }
 
-    private List<Key> FindRecipientKeys(List<string> to, Curve curve)
+    private async Task<List<Key>> FindRecipientKeys(List<string> to, Curve curve)
     {
-        var keys = _secretResolver.FindKeys(to);
+        var keys = await _secretResolver.FindKeys(to);
         if (!keys.Any())
         {
             throw new SecretNotFoundException(string.Join(",", to));
         }
 
-        return keys
-            .Where(k => DidUtils.IsDidFragment(k))
-            .Select(k => _secretResolver.FindKey(k))
-            .Where(k => k != null)
-            .Select(k => Key.FromSecret(k))
-            .Select(k =>
+        var hs = new HashSet<Key>();
+        foreach (var didFragment in keys.Where(p => DidUtils.IsDidFragment(p)))
+        {
+            var secret = await _secretResolver.FindKey(didFragment);
+            if (secret != null)
             {
-                if (curve != null && curve != k.Curve)
+                var key = Key.FromSecret(secret);
+                if (curve != null && curve != key.Curve)
                 {
-                    throw new IncompatibleCryptoException($"The recipient '{k.Id}' curve is not compatible to '{curve.Name}'");
+                    throw new IncompatibleCryptoException($"The recipient '{key.Id}' curve is not compatible to '{curve.Name}'");
                 }
+        
+                hs.Add(key);
+            }
+        }
 
-                return k;
-            }).ToList();
+        return hs.ToList();
     }
 }

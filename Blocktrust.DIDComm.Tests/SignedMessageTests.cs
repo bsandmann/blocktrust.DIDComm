@@ -11,18 +11,18 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 public class SignedMessageTests
 {
     [Fact]
-    public void Test_signed_message_test_vectors()
+    public async Task Test_signed_message_test_vectors()
     {
     
         foreach (var test in JWSFixture.TEST_VECTORS)
         {
             var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
     
-            var packed = didComm.PackSigned(
+            var packed = await didComm.PackSigned(
                 new PackSignedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, test.from).BuildPackSginedParams()
             );
     
-            var unpacked = didComm.Unpack(
+            var unpacked = await didComm.Unpack(
                 new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
             );
     
@@ -52,13 +52,13 @@ public class SignedMessageTests
 
 
     [Fact]
-    public void Test_from_is_not_a_did_or_did_url()
+    public async Task Test_from_is_not_a_did_or_did_url()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        Assert.Throws<DidCommIllegalArgumentException>(() =>
+        await Assert.ThrowsAsync<DidCommIllegalArgumentException>(async () =>
         {
-            didComm.PackSigned(
+           await didComm.PackSigned(
                 new PackSignedParamsBuilder(
                     JWMFixture.PLAINTEXT_MESSAGE,
                     signFrom: "not-a-did"
@@ -68,12 +68,12 @@ public class SignedMessageTests
     }
 
     [Fact]
-    public void Test_from_unknown_did()
+    public async Task Test_from_unknown_did()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
-        Assert.Throws<DidCommIllegalArgumentException>(() =>
+        await Assert.ThrowsAsync<DidCommIllegalArgumentException>(async () =>
         {
-            didComm.PackSigned(
+            await didComm.PackSigned(
                 new PackSignedParamsBuilder(
                     JWMFixture.PLAINTEXT_MESSAGE,
                     signFrom: "did:example:unknown"
@@ -83,13 +83,13 @@ public class SignedMessageTests
     }
 
     [Fact]
-    public void Test_from_unknown_did_url()
+    public async Task Test_from_unknown_did_url()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        Assert.Throws<SecretNotFoundException>(() =>
+        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
         {
-            didComm.PackSigned(
+          await  didComm.PackSigned(
                 new PackSignedParamsBuilder(
                     JWMFixture.PLAINTEXT_MESSAGE,
                     signFrom: JWMFixture.ALICE_DID + "#unknown-key"
@@ -99,13 +99,13 @@ public class SignedMessageTests
     }
 
     [Fact]
-    public void Test_from_not_in_secrets()
+    public async Task Test_from_not_in_secrets()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var frm = TestUtils.GetAuthMethodsNotInSecrets(TestUtils.Person.ALICE)[0].Id;
-        Assert.Throws<SecretNotFoundException>(() =>
+        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
         {
-            didComm.PackSigned(
+          await  didComm.PackSigned(
                 new PackSignedParamsBuilder(
                     JWMFixture.PLAINTEXT_MESSAGE,
                     signFrom: frm

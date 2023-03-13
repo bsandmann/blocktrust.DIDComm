@@ -22,8 +22,8 @@ public class DidDocResolverMock : IDidDocResolver
         });
     }
 
-    public DidDoc? Resolve(String did)
+    public async Task<DidDoc?> Resolve(String did)
     {
-        return _didDocResolver.Resolve(did);
+        return await _didDocResolver.Resolve(did);
     }
 }

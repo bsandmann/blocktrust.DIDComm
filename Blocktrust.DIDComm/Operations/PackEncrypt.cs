@@ -11,11 +11,11 @@ using Utils;
 
 public class PackEncrypt
 {
-    public static (string, string?) SignIfNeeded(string message, PackEncryptedParams param, SenderKeySelector keySelector)
+    public static async Task<(string, string?)> SignIfNeeded(string message, PackEncryptedParams param, SenderKeySelector keySelector)
     {
         if (param.SignFrom != null)
         {
-            var key = keySelector.FindSigningKey(param.SignFrom);
+            var key = await keySelector.FindSigningKey(param.SignFrom);
             return (Jws.Sign(message, key), key.Id);
         }
         else
@@ -24,16 +24,16 @@ public class PackEncrypt
         }
     }
 
-    public static (EncryptResult, List<Key>) Encrypt(PackEncryptedParams param, string payload, SenderKeySelector keySelector)
+    public static async Task<(EncryptResult, List<Key>)> Encrypt(PackEncryptedParams param, string payload, SenderKeySelector keySelector)
     {
         if (param.From != null)
         {
-            (var senderKey, var recipientKeys) = keySelector.FindAuthCryptKeys(param.From, param.To);
+            (var senderKey, var recipientKeys) = await keySelector.FindAuthCryptKeys(param.From, param.To);
             return (JweExtensions.AuthEncrypt(payload, param.EncAlgAuth, senderKey, recipientKeys), recipientKeys);
         }
         else
         {
-            var recipientKeys = keySelector.FindAnonCryptKeys(param.To);
+            var recipientKeys = await keySelector.FindAnonCryptKeys(param.To);
             return (JweExtensions.AnonEncrypt(payload, param.EncAlgAnon, recipientKeys), recipientKeys);
         }
     }
@@ -50,7 +50,7 @@ public class PackEncrypt
         }
     }
 
-    public static WrapInForwardResult? WrapInForwardIfNeeded(
+    public static async Task<WrapInForwardResult?> WrapInForwardIfNeeded(
         string packedMessage,
         PackEncryptedParams param,
         List<Service> didServicesChain,
@@ -75,7 +75,7 @@ public class PackEncrypt
         }
 
         var r = new Routing(ididDocResolver, secretResolver);
-        return r.WrapInForward(
+        return await r.WrapInForward(
             JsonUtils.FromJsonToMap(packedMessage),
             param.To,
             param.EncAlgAnon,

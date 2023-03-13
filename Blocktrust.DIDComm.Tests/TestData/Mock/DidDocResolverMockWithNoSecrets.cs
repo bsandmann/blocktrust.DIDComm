@@ -23,8 +23,8 @@ public class DidDocResolverMockWithNoSecrets : IDidDocResolver
             });
     }
 
-    public DidDoc? Resolve(string did)
+    public async Task<DidDoc?> Resolve(string did)
     {
-        return _didDocResolver.Resolve(did);
+        return await _didDocResolver.Resolve(did);
     }
 }

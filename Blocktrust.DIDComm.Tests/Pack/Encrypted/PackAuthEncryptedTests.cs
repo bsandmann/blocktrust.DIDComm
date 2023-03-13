@@ -87,14 +87,14 @@ public class PackAuthEncryptedTests
         }
     }
 
-    public void CheckAuthcrypt(PackAuthEncryptedTestData data, string from, string to)
+    public async Task CheckAuthcrypt(PackAuthEncryptedTestData data, string from, string to)
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
         PackEncryptedResult packResult = null;
         try
         {
-            packResult = didComm.PackEncrypted(
+            packResult = await didComm.PackEncrypted(
                 new PackEncryptedParamsBuilder(data.Msg, to)
                     .From(from)
                     .SignFrom(data.SignedFrom)
@@ -130,7 +130,7 @@ public class PackAuthEncryptedTests
 
         var recipientKeySelector = new RecipientKeySelector(new DidDocResolverMock(), new BobSecretResolverMock());
 
-        var unpackResult = Unpacker.Unpack(
+        var unpackResult = await Unpacker.Unpack(
             keySelector: recipientKeySelector,
             param: new UnpackParamsBuilder(packResult.PackedMessage)
                 .ExpectDecryptByAllKeys(true)

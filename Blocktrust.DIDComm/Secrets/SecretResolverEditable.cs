@@ -15,17 +15,17 @@ public class SecretResolverEditable : ISecretResolver
         throw new NotImplementedException();
     }
 
-    public Secret? FindKey(string kid)
+    public Task<Secret?> FindKey(string kid)
     {
         throw new NotImplementedException();
     }
 
-    public HashSet<string> FindKeys(List<string> kids)
+    public Task<HashSet<string>> FindKeys(List<string> kids)
     {
         throw new NotImplementedException();
     }
 
-    public void AddKey(string kid, Secret secret)
+    public Task AddKey(string kid, Secret secret)
     {
         throw new NotImplementedException();
     }

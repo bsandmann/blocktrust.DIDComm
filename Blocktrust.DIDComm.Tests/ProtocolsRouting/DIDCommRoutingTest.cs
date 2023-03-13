@@ -25,7 +25,7 @@ public class DIDCommRoutingTest
     private readonly Routing _routing = new Routing(DidDocResolver, AliceSecretResolver);
 
      [Fact]
-     public void Test_single_mediator()
+     public async Task Test_single_mediator()
      {
          var message = Message.Builder(
                  id: "1234567890",
@@ -38,7 +38,7 @@ public class DIDCommRoutingTest
              .expiresTime(1516385931)
              .build();
      
-         var packResult = _didComm.PackEncrypted(
+         var packResult = await _didComm.PackEncrypted(
              PackEncryptedParams.Builder(message, BOB_DID)
                  .From(ALICE_DID)
                  .BuildPackEncryptedParams()
@@ -46,7 +46,7 @@ public class DIDCommRoutingTest
      
          // BOB MEDIATOR
          // TODO ??? why do we need the recipients selector (question to 'unpack' actually)
-         var forwardBob = _routing.UnpackForward(
+         var forwardBob = await _routing.UnpackForward(
              packResult.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
@@ -54,7 +54,7 @@ public class DIDCommRoutingTest
          var forwardedMsg = JsonUtils.ToJson(forwardBob.Value.ForwardMsg.ForwardedMsg);
      
          // BOB
-         var unpackResult = _didComm.Unpack(
+         var unpackResult =await  _didComm.Unpack(
              new UnpackParamsBuilder(forwardedMsg)
                  .SecretResolver(_bobSecretResolver)
                  .BuildUnpackParams()
@@ -73,7 +73,7 @@ public class DIDCommRoutingTest
      }
     
      [Fact]
-     public void Test_multiple_mediators()
+     public async Task Test_multiple_mediators()
      {
          var message = Message.Builder(
                  id: "1234567890",
@@ -86,7 +86,7 @@ public class DIDCommRoutingTest
              .expiresTime(1516385931)
              .build();
      
-         var packResult = _didComm.PackEncrypted(
+         var packResult = await _didComm.PackEncrypted(
              PackEncryptedParams.Builder(message, CHARLIE_DID)
                  .From(ALICE_DID)
                  .BuildPackEncryptedParams()
@@ -94,7 +94,7 @@ public class DIDCommRoutingTest
      
          // TODO make focused on initial subject (without forward)
          // CHARLIE's first mediator (MEDIATOR2)
-         var forwardCharlie = _routing.UnpackForward(
+         var forwardCharlie = await _routing.UnpackForward(
              packResult.PackedMessage,
              secretResolver: _mediator2SecretResolver
          );
@@ -102,7 +102,7 @@ public class DIDCommRoutingTest
          var forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
          
          // CHARLIE's second mediator (MEDIATOR1)
-         forwardCharlie = _routing.UnpackForward(
+         forwardCharlie = await _routing.UnpackForward(
              forwardedMsg,
              secretResolver: _mediator1SecretResolver
          );
@@ -110,7 +110,7 @@ public class DIDCommRoutingTest
          forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
          
          // CHARLIE
-         var unpackResult = _didComm.Unpack(
+         var unpackResult =await  _didComm.Unpack(
              new UnpackParamsBuilder(forwardedMsg)
                  .SecretResolver(_charlieSecretResolver)
                  .ExpectDecryptByAllKeys(true)
@@ -130,7 +130,7 @@ public class DIDCommRoutingTest
      }
 
      [Fact]
-     public void Test_single_mediator_re_wrap_to_unknown()
+     public async Task Test_single_mediator_re_wrap_to_unknown()
      {
          var message = Message.Builder(
                  id: "1234567890",
@@ -143,14 +143,14 @@ public class DIDCommRoutingTest
              .expiresTime(1516385931)
              .build();
      
-         var packResult = _didComm.PackEncrypted(
+         var packResult = await _didComm.PackEncrypted(
              PackEncryptedParams.Builder(message, BOB_DID)
                  .From(ALICE_DID)
                  .BuildPackEncryptedParams()
          );
      
          // BOB's MEDIATOR
-         var forwardBob = _routing.UnpackForward(
+         var forwardBob = await _routing.UnpackForward(
              packResult.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
@@ -159,7 +159,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(nextTo);
      
          // re-wrap to unexpected mediator (MEDIATOR2 here)
-         var wrapResult = _routing.WrapInForward(
+         var wrapResult = await _routing.WrapInForward(
              forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { MEDIATOR2_DID },
@@ -169,7 +169,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(wrapResult);
      
          // MEDIATOR2
-         forwardBob = _routing.UnpackForward(
+         forwardBob = await _routing.UnpackForward(
              wrapResult.MsgEncrypted.PackedMessage,
              secretResolver: _mediator2SecretResolver
          );
@@ -177,7 +177,7 @@ public class DIDCommRoutingTest
          var forwardedMsg = JsonUtils.ToJson(forwardBob.Value.ForwardMsg.ForwardedMsg);
      
          // BOB
-         var unpackResult = _didComm.Unpack(
+         var unpackResult =await  _didComm.Unpack(
              new UnpackParamsBuilder(forwardedMsg)
                  .SecretResolver(_bobSecretResolver)
                  .BuildUnpackParams()
@@ -196,7 +196,7 @@ public class DIDCommRoutingTest
      }
 
      [Fact]
-     public void Test_single_mediator_re_wrap_anoncrypt_to_receiver()
+     public async Task Test_single_mediator_re_wrap_anoncrypt_to_receiver()
      {
          var message = Message.Builder(
                  id: "1234567890",
@@ -208,12 +208,12 @@ public class DIDCommRoutingTest
              .expiresTime(1516385931)
              .build();
      
-         var packResult = _didComm.PackEncrypted(
+         var packResult = await _didComm.PackEncrypted(
              PackEncryptedParams.Builder(message, BOB_DID).BuildPackEncryptedParams()
          );
      
          // BOB's MEDIATOR
-         var forwardBob = _routing.UnpackForward(
+         var forwardBob = await _routing.UnpackForward(
              packResult.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
@@ -222,7 +222,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(nextTo);
      
          // re-wrap to the receiver
-         var wrapResult = _routing.WrapInForward(
+         var wrapResult = await _routing.WrapInForward(
              forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { nextTo },
@@ -232,7 +232,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(wrapResult);
      
          // BOB
-         var unpackResult = _didComm.Unpack(
+         var unpackResult =await  _didComm.Unpack(
              new UnpackParamsBuilder(wrapResult.MsgEncrypted.PackedMessage)
                  .SecretResolver(_bobSecretResolver)
                  .UnwrapReWrappingForward(true)
@@ -254,7 +254,7 @@ public class DIDCommRoutingTest
      }
 
      [Fact]
-     public void Test_single_mediator_re_wrap_authcrypt_to_receiver()
+     public async Task Test_single_mediator_re_wrap_authcrypt_to_receiver()
      {
          var message = Message.Builder(
                  id: "1234567890",
@@ -267,14 +267,14 @@ public class DIDCommRoutingTest
              .expiresTime(1516385931)
              .build();
     
-         var packResult = _didComm.PackEncrypted(
+         var packResult = await _didComm.PackEncrypted(
              PackEncryptedParams.Builder(message, BOB_DID)
                  .From(ALICE_DID)
                  .BuildPackEncryptedParams()
          );
     
          // BOB's MEDIATOR
-         var forwardBob = _routing.UnpackForward(
+         var forwardBob = await _routing.UnpackForward(
              packResult.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
@@ -283,7 +283,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(nextTo);
     
          // re-wrap to the receiver
-         var wrapResult = _routing.WrapInForward(
+         var wrapResult = await _routing.WrapInForward(
              forwardBob.Value.ForwardMsg.ForwardedMsg,
              nextTo,
              routingKeys: new List<string> { nextTo },
@@ -293,7 +293,7 @@ public class DIDCommRoutingTest
          Assert.NotNull(wrapResult);
     
          // BOB
-         var unpackResult = _didComm.Unpack(
+         var unpackResult =await  _didComm.Unpack(
              new UnpackParamsBuilder(wrapResult.MsgEncrypted.PackedMessage)
                  .SecretResolver(_bobSecretResolver)
                  .UnwrapReWrappingForward(true)
@@ -314,7 +314,7 @@ public class DIDCommRoutingTest
      }
 
     [Fact]
-    public void Test_unwrap_re_wrapping_forward_mode_for_no_re_wrapping()
+    public async Task Test_unwrap_re_wrapping_forward_mode_for_no_re_wrapping()
     {
         var message = Message.Builder(
                 id: "1234567890",
@@ -325,12 +325,12 @@ public class DIDCommRoutingTest
             .createdTime(1516269022)
             .expiresTime(1516385931)
             .build();
-        var packResult = _didComm.PackEncrypted(
+        var packResult = await _didComm.PackEncrypted(
             PackEncryptedParams.Builder(message, BOB_DID).BuildPackEncryptedParams()
         );
     
         // BOB's MEDIATOR
-        var unpackResultAtMediator = _didComm.Unpack(
+        var unpackResultAtMediator =await  _didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(_mediator1SecretResolver)
                 .UnwrapReWrappingForward(true)
@@ -348,7 +348,7 @@ public class DIDCommRoutingTest
         Assert.False(unpackResultAtMediator.Value.Metadata.ReWrappedInForward);
     
         // BOB
-        var unpackResult = _didComm.Unpack(
+        var unpackResult =await  _didComm.Unpack(
             new UnpackParamsBuilder(JsonUtils.ToJson(forwardMessage.ForwardedMsg))
                 .SecretResolver(_bobSecretResolver)
                 .UnwrapReWrappingForward(true)

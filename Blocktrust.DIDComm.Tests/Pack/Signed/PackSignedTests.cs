@@ -28,14 +28,14 @@ public class PackSignedTests
 
     [Theory]
     [MemberData(nameof(PackSignedTest))]
-    public void TestSigned(PackSignedTestData data)
+    public async Task TestSigned(PackSignedTestData data)
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
         PackSignedResult packResult;
         try
         {
-            packResult = didComm.PackSigned(
+            packResult = await didComm.PackSigned(
                 new PackSignedParamsBuilder(message: data.Msg, signFrom: data.SignedFrom).BuildPackSginedParams()
             );
         }
@@ -53,7 +53,7 @@ public class PackSignedTests
         Assert.Equal(packResult.SignFromKid, expectedSignFrm);
         Assert.NotNull(packResult.PackedMessage);
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult =await  didComm.Unpack(
             param: new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .ExpectDecryptByAllKeys(true)

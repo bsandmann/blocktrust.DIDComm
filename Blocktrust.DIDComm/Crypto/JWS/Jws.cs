@@ -138,7 +138,7 @@ public class Jws
     }
 
     //TODO moved it here
-    public static Message Unpack(JwsParseResult jwsParseResult, RecipientKeySelector keySelector, UnpackResultBuilder metadataUnpackResultBuilder)
+    public static async Task<Message> Unpack(JwsParseResult jwsParseResult, RecipientKeySelector keySelector, UnpackResultBuilder metadataUnpackResultBuilder)
     {
         if (jwsParseResult.Token.Signatures == null)
         {
@@ -150,7 +150,7 @@ public class Jws
             var kidObject = it.UnprotectedHeader["kid"] ?? throw new MalformedMessageException("JWS Unprotected Per-Signature header must be present");
             var kidJsonElement = (JsonElement)kidObject;
             var kid = kidJsonElement.ToString();
-            var key = keySelector.FindVerificationKey(kid);
+            var key = await keySelector.FindVerificationKey(kid);
             if (key == null)
             {
                 throw new MalformedMessageException("No key found for kid: " + kidObject);
@@ -173,7 +173,7 @@ public class Jws
         var parseResult = JwmParseResult.Parse(unpackedMessage);
         return parseResult switch
         {
-            JwmParseResult jwm => JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
+            JwmParseResult jwm => await JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
             _ => throw new MalformedMessageException("Malformed Message")
         };
     }

@@ -31,14 +31,14 @@ public class Routing
     }
 
 
-    public static List<Service> ResolveDidCommServicesChain(
+    public static async Task<List<Service>> ResolveDidCommServicesChain(
         IDidDocResolver ididDocResolver,
         string to,
         string serviceId = null,
         bool didRecursion = false
     )
     {
-        var toDidService = FindDidCommService(ididDocResolver, to, serviceId);
+        var toDidService = await FindDidCommService(ididDocResolver, to, serviceId);
         if (toDidService == null) return new List<Service>();
 
         var res = new List<Service>();
@@ -67,7 +67,7 @@ public class Routing
                 }
             }
 
-            var mediatorDidService = FindDidCommService(ididDocResolver, mediatorDid);
+            var mediatorDidService = await FindDidCommService(ididDocResolver, mediatorDid);
             if (mediatorDidService == null)
             {
                 throw new DidCommServiceException(
@@ -82,7 +82,7 @@ public class Routing
         return res;
     }
 
-    internal static Service? FindDidCommService(
+    internal static async Task<Service?> FindDidCommService(
         IDidDocResolver ididDocResolver,
         string to,
         string? serviceId = null
@@ -92,7 +92,7 @@ public class Routing
         // TODO this copy() is not needed for single tests, but not having it breaks the tests when running in parallel
         // This issue has to be investigated and cleared up before merging
 
-        DidDoc? didDoc = ididDocResolver.Resolve(toDid).Copy();
+        DidDoc? didDoc = await ididDocResolver.Resolve(toDid).Copy();
         if (didDoc is null)
         {
             throw new DidDocNotResolvedException(toDid);
@@ -129,7 +129,7 @@ public class Routing
         }
     }
 
-    public WrapInForwardResult WrapInForward(
+    public async Task<WrapInForwardResult> WrapInForward(
         Dictionary<string, object> packedMsg,
         string to,
         AnonCryptAlg encAlgAnon = null,
@@ -192,9 +192,9 @@ public class Routing
                 packParamsBuilder.EncAlgAnon(encAlgAnon);
             }
 
-            encryptedResult = PackEncrypt.Encrypt(
+            encryptedResult = (await PackEncrypt.Encrypt(
                 packParamsBuilder.BuildPackEncryptedParams(), fwdMsg.Message.ToString(), keySelector
-            ).Item1;
+            )).Item1;
 
             //TODO?? correct?
             forwardedMsg = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(encryptedResult.PackedMessage);
@@ -214,7 +214,7 @@ public class Routing
     }
 
 
-    public Result<UnpackForwardResult> UnpackForward(
+    public async Task<Result<UnpackForwardResult>> UnpackForward(
         string packedMessage,
         bool expectDecryptByAllKeys = false,
         IDidDocResolver? didDocResolver = null,
@@ -225,7 +225,7 @@ public class Routing
         ISecretResolver _secretResolver = secretResolver ?? this._secretResolver;
         RecipientKeySelector recipientKeySelector = new RecipientKeySelector(ididDocResolver, _secretResolver);
 
-        var unpackResult = Unpacker.Unpack(
+        var unpackResult = await Unpacker.Unpack(
             new UnpackParamsBuilder(packedMessage)
                 .ExpectDecryptByAllKeys(expectDecryptByAllKeys)
                 .UnwrapReWrappingForward(false)

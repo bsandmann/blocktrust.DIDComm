@@ -304,7 +304,7 @@ public class JweExtensions
     }
 
     // //TODO moved here. unclear if references are correct 
-    public static (Message, Metadata) Unpack(
+    public static async Task<(Message, Metadata)> Unpack(
         JweParseResult jweParseResult,
         RecipientKeySelector keySelector,
         bool expectDecryptByAllKeys,
@@ -316,7 +316,7 @@ public class JweExtensions
         switch (alg)
         {
             case AuthCryptAlg:
-                var f = JweExtensions.AuthUnpack(
+                var f = await JweExtensions.AuthUnpack(
                     jweParseResult,
                     keySelector,
                     (AuthCryptAlg)alg,
@@ -326,7 +326,7 @@ public class JweExtensions
                 //TODO?
                 return (f, null);
             case AnonCryptAlg:
-                var f2 = JweExtensions.AnonUnpack(
+                var f2 = await JweExtensions.AnonUnpack(
                     jweParseResult,
                     keySelector,
                     (AnonCryptAlg)alg,
@@ -343,7 +343,7 @@ public class JweExtensions
     }
 
 
-    private static Message AuthUnpack(
+    private static async Task<Message> AuthUnpack(
         JweParseResult jweParseResult,
         RecipientKeySelector keySelector,
         AuthCryptAlg authCryptAlg,
@@ -382,7 +382,7 @@ public class JweExtensions
             throw new MalformedMessageException("apv is invalid");
         }
 
-        var (from, to) = keySelector.FindAuthCryptKeys(senderKeyId, kidList);
+        var (from, to) = await keySelector.FindAuthCryptKeys(senderKeyId, kidList);
         var decrypted = AuthDecrypt(jweParseResult.Message, decryptByAllKeys, from, to);
 
         metadataUnpackResultBuilder
@@ -394,13 +394,13 @@ public class JweExtensions
 
         return JwmParseResult.Parse(decrypted.UnpackedMessage) switch
         {
-            JwsParseResult jws => Jws.Unpack(jws, keySelector, metadataUnpackResultBuilder),
-            JwmParseResult jwm => JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
+            JwsParseResult jws => await Jws.Unpack(jws, keySelector, metadataUnpackResultBuilder),
+            JwmParseResult jwm => await JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
             _ => throw new MalformedMessageException("Malformed Message")
         };
     }
 
-    private static Message AnonUnpack(
+    private static async Task<Message> AnonUnpack(
         JweParseResult jweParseResult,
         RecipientKeySelector keySelector,
         AnonCryptAlg anonCryptAlg,
@@ -446,7 +446,7 @@ public class JweExtensions
             }
         }
 
-        var to = keySelector.FindAnonCryptKeys(kidList).ToList();
+        var to = (await keySelector.FindAnonCryptKeys(kidList)).ToList();
         var decrypted = AnonDecrypt(jweParseResult.Message, decryptByAllKeys, to);
 
         metadataUnpackResultBuilder
@@ -463,11 +463,10 @@ public class JweExtensions
             if (jwmMessage.Message.Body.ContainsKey("next"))
             {
                 var forwardMsg = ForwardMessage.FromMessage(jwmMessage.Message);
-                //TODO
-                if (keySelector.HasKeysForForwardNext(forwardMsg.ForwardNext))
+                if (await keySelector.HasKeysForForwardNext(forwardMsg.ForwardNext))
                 {
                     metadataUnpackResultBuilder.ReWrappedInForward(true);
-                    var unpacked = Unpacker.Unpack(
+                    var unpacked = await Unpacker.Unpack(
                         forwardMsg.ForwardedMsg,
                         keySelector,
                         metadataUnpackResultBuilder,
@@ -482,19 +481,19 @@ public class JweExtensions
 
         return parseResult switch
         {
-            JweParseResult jwe => JweExtensions.AnonAuthUnpack(jwe, keySelector, decryptByAllKeys, metadataUnpackResultBuilder),
-            JwsParseResult jws => Jws.Unpack(jws, keySelector, metadataUnpackResultBuilder),
-            JwmParseResult jwm => JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
+            JweParseResult jwe => await JweExtensions.AnonAuthUnpack(jwe, keySelector, decryptByAllKeys, metadataUnpackResultBuilder),
+            JwsParseResult jws => await Jws.Unpack(jws, keySelector, metadataUnpackResultBuilder),
+            JwmParseResult jwm => await JwmExtensions.Unpack(jwm, keySelector, metadataUnpackResultBuilder),
             _ => throw new MalformedMessageException("Malformed Message")
         };
     }
 
-    private static Message AnonAuthUnpack(JweParseResult jwe, RecipientKeySelector keySelector, bool decryptByAllKeys, UnpackResultBuilder metadataUnpackResultBuilder)
+    private static async Task<Message> AnonAuthUnpack(JweParseResult jwe, RecipientKeySelector keySelector, bool decryptByAllKeys, UnpackResultBuilder metadataUnpackResultBuilder)
     {
         var alg = JweExtensions.GetCryptoAlg(jwe.Message);
         return alg switch
         {
-            AuthCryptAlg authCryptAlg => AuthUnpack(jwe, keySelector, authCryptAlg, decryptByAllKeys, metadataUnpackResultBuilder),
+            AuthCryptAlg authCryptAlg => await AuthUnpack(jwe, keySelector, authCryptAlg, decryptByAllKeys, metadataUnpackResultBuilder),
             _ => throw new MalformedMessageException("Malformed Message")
         };
     }

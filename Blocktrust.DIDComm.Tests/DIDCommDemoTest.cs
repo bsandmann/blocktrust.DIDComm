@@ -18,7 +18,7 @@ public class DIDCommDemoTest
     private const string CHARLIE_DID = "did:example:charlie";
 
     [Fact]
-    public void Test_repudiable_authentication_encryption_message()
+    public async Task Test_repudiable_authentication_encryption_message()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
@@ -33,13 +33,13 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackEncrypted(
+        var packResult = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID)
                 .From(ALICE_DID)
                 .BuildPackEncryptedParams()
         );
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult = await didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
@@ -59,7 +59,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_repudiable_non_authenticated_encryption_message()
+    public async Task Test_repudiable_non_authenticated_encryption_message()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
@@ -73,11 +73,11 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackEncrypted(
+        var packResult = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID).BuildPackEncryptedParams()
         );
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult = await didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
@@ -95,7 +95,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_non_repudiable_encryption_message()
+    public async Task Test_non_repudiable_encryption_message()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var message = Message.Builder(
@@ -109,14 +109,14 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackEncrypted(
+        var packResult = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID)
                 .SignFrom(ALICE_DID)
                 .From(ALICE_DID)
                 .BuildPackEncryptedParams());
 
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult = await didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
@@ -134,7 +134,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_non_repudiable_encryption_message_for_anonymous_sender()
+    public async Task Test_non_repudiable_encryption_message_for_anonymous_sender()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var message = Message.Builder(
@@ -148,7 +148,7 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackEncrypted(
+        var packResult = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID)
                 .ProtectSenderId(true)
                 .SignFrom(ALICE_DID)
@@ -156,7 +156,7 @@ public class DIDCommDemoTest
                 .BuildPackEncryptedParams()
         );
     
-        var unpackResult = didComm.Unpack(
+        var unpackResult = await didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
@@ -174,7 +174,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_signed_unencrypted_message()
+    public async Task Test_signed_unencrypted_message()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var message = Message.Builder(
@@ -188,11 +188,11 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackSigned(
+        var packResult = await didComm.PackSigned(
             new PackSignedParamsBuilder(message, ALICE_DID).BuildPackSginedParams()
         );
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult =await  didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
         );
         
@@ -208,7 +208,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_plaintext_message()
+    public async Task Test_plaintext_message()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var message = Message.Builder(
@@ -222,11 +222,11 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
 
-        var packResult = didComm.PackPlaintext(
+        var packResult = await didComm.PackPlaintext(
             new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
         );
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult =await  didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
         );
 
@@ -244,7 +244,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_multi_recipient_support()
+    public async Task Test_multi_recipient_support()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var routing = new Routing(new DidDocResolverMock(), new AliceSecretResolverMock());
@@ -259,7 +259,7 @@ public class DIDCommDemoTest
             .expiresTime(1516385931)
             .build();
     
-        var packResultBob = didComm.PackEncrypted(
+        var packResultBob = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID)
                 .ProtectSenderId(true)
                 .SignFrom(ALICE_DID)
@@ -267,7 +267,7 @@ public class DIDCommDemoTest
                 .BuildPackEncryptedParams()
         );
         
-        var unpackResultBob = didComm.Unpack(
+        var unpackResultBob =await  didComm.Unpack(
             new UnpackParamsBuilder(packResultBob.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
@@ -279,7 +279,7 @@ public class DIDCommDemoTest
         Assert.True(unpackResultBob.Value.Metadata.AnonymousSender);
         Assert.False(unpackResultBob.Value.Metadata.ReWrappedInForward);
 
-        var packResultCharlie = didComm.PackEncrypted(
+        var packResultCharlie = await didComm.PackEncrypted(
             PackEncryptedParams.Builder(message, CHARLIE_DID)
                 .ProtectSenderId(true)
                 .SignFrom(ALICE_DID)
@@ -288,21 +288,21 @@ public class DIDCommDemoTest
         );
         
     
-        var forwardCharlie = routing.UnpackForward(
+        var forwardCharlie = await routing.UnpackForward(
             packResultCharlie.PackedMessage,
             secretResolver: new Mediator2SecretResolverMock()
         );
     
         var forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
     
-        forwardCharlie = routing.UnpackForward(
+        forwardCharlie = await routing.UnpackForward(
             forwardedMsg,
             secretResolver: new Mediator1SecretResolverMock()
         );
     
         forwardedMsg = JsonUtils.ToJson(forwardCharlie.Value.ForwardMsg.ForwardedMsg);
     
-        var unpackResultCharlie = didComm.Unpack(
+        var unpackResultCharlie =await  didComm.Unpack(
             new UnpackParamsBuilder(forwardedMsg)
                 .SecretResolver(new CharlieSecretResolverMock())
                 .BuildUnpackParams()
@@ -339,7 +339,7 @@ public class DIDCommDemoTest
     }
 
     [Fact]
-    public void Test_encrypt_message_with_attachments()
+    public async Task Test_encrypt_message_with_attachments()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var attachments = new List<Attachment>
@@ -360,11 +360,11 @@ public class DIDCommDemoTest
             .to(new List<string> { BOB_DID })
             .build();
 
-        var packResult = didComm.PackEncrypted(
+        var packResult = await didComm.PackEncrypted(
             new PackEncryptedParamsBuilder(message, BOB_DID).BuildPackEncryptedParams()
         );
 
-        var unpackResult = didComm.Unpack(
+        var unpackResult =await  didComm.Unpack(
             new UnpackParamsBuilder(packResult.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()

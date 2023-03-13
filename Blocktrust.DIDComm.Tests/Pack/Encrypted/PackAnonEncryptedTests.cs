@@ -45,7 +45,7 @@ public class PackAnonEncryptedTests
         PackEncryptedResult packResult;
         try
         {
-            packResult = didComm.PackEncrypted(new PackEncryptedParamsBuilder(
+            packResult = await didComm.PackEncrypted(new PackEncryptedParamsBuilder(
                     message: data.Msg,
                     to: data.To)
                 .SignFrom(data.SignedFrom)
@@ -72,7 +72,7 @@ public class PackAnonEncryptedTests
         Assert.NotNull(packResult.PackedMessage);
     
         var didCommUnpack = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
-        var unpackResult = didCommUnpack.Unpack(new UnpackParamsBuilder(
+        var unpackResult =await  didCommUnpack.Unpack(new UnpackParamsBuilder(
             packedMessage: packResult.PackedMessage).ExpectDecryptByAllKeys(true).BuildUnpackParams());
     
         Assert.Equal(unpackResult.Value.Message.ToString(), data.Msg.ToString());

@@ -54,17 +54,17 @@ public class CharlieSecretResolverMock : SecretResolverInMemoryMock
         return secrets.Select(secret => secret.Kid).ToList();
     }
 
-    public Secret? FindKey(String kid)
+    public Task<Secret?> FindKey(String kid)
     {
         return _secretResolverInMemory.FindKey(kid);
     }
 
-    public HashSet<String> FindKeys(List<String> kids)
+    public Task<HashSet<String>> FindKeys(List<String> kids)
     {
         return _secretResolverInMemory.FindKeys(kids);
     }
 
-    public void AddKey(string kid, Secret secret)
+    public Task AddKey(string kid, Secret secret)
     {
         throw new NotImplementedException();
     }

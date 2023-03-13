@@ -26,49 +26,49 @@ public class DidComm
         this._secretResolver = secretResolver;
     }
 
-    public PackPlaintextResult PackPlaintext(PackPlaintextParams param)
+    public async Task<PackPlaintextResult> PackPlaintext(PackPlaintextParams param)
     {
         var didDocResolver = param.DidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
 
         return new PackPlaintextResult(message.ToString(), fromPriorIssuerKid);
     }
 
-    public PackSignedResult PackSigned(PackSignedParams param)
+    public async Task<PackSignedResult> PackSigned(PackSignedParams param)
     {
         var didDocResolver = param.IdidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
-        var signFromKey = senderKeySelector.FindSigningKey(param.SignFrom);
+        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        var signFromKey = await senderKeySelector.FindSigningKey(param.SignFrom);
         var msg = Jws.Sign(message.ToString(), signFromKey);
 
         return new PackSignedResult(msg, signFromKey.Id, fromPriorIssuerKid);
     }
 
 
-    public PackEncryptedResult PackEncrypted(PackEncryptedParams param)
+    public async Task<PackEncryptedResult> PackEncrypted(PackEncryptedParams param)
     {
         var didDocResolver = param.DidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
-        var (payload, signFromKid) = Operations.PackEncrypt.SignIfNeeded(message.ToString(), param, senderKeySelector);
-        var (encryptedResult, recipientKeys) = PackEncrypt.Encrypt(param, payload, senderKeySelector);
+        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        var (payload, signFromKid) = await Operations.PackEncrypt.SignIfNeeded(message.ToString(), param, senderKeySelector);
+        var (encryptedResult, recipientKeys) = await PackEncrypt.Encrypt(param, payload, senderKeySelector);
         var encryptResult = PackEncrypt.ProtectSenderIfNeeded(param, encryptedResult, recipientKeys);
 
         // TODO make that (along with service metadata) as
         //      an internal part of routing routine
-        var didServicesChain = Routing.ResolveDidCommServicesChain(
+        var didServicesChain =await Routing.ResolveDidCommServicesChain(
             didDocResolver, param.To, param.ForwardServiceId
         );
 
-        var wrapInForwardResult = PackEncrypt.WrapInForwardIfNeeded(
+        var wrapInForwardResult =await PackEncrypt.WrapInForwardIfNeeded(
             encryptResult.PackedMessage, param, didServicesChain, didDocResolver, secretResolver
         );
 
@@ -92,12 +92,12 @@ public class DidComm
         );
     }
 
-    public Result<UnpackResult> Unpack(UnpackParams param)
+    public async Task<Result<UnpackResult>> Unpack(UnpackParams param)
     {
         var didDocResolver = param.IdidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var recipientKeySelector = new RecipientKeySelector(didDocResolver, secretResolver);
 
-        return Unpacker.Unpack(param, recipientKeySelector);
+        return await Unpacker.Unpack(param, recipientKeySelector);
     }
 }

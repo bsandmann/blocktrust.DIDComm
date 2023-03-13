@@ -22,16 +22,16 @@ public class TestToFromDifferentCurves
 
     [Theory]
     [MemberData(nameof(ToFromDifferentCurvesData))]
-    public void TestToFromDifferentCurve(ToFromDifferentCurvesTestData data)
+    public async Task TestToFromDifferentCurve(ToFromDifferentCurvesTestData data)
     {
         if (data.CurveTypeRecipient == data.CurveTypeSender) return;
-    
+
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var fromKid = TestUtils.GetKeyAgreementMethodsInSecrets(TestUtils.Person.ALICE, data.CurveTypeSender)[0].Id;
         var toKid = TestUtils.GetKeyAgreementMethodsInSecrets(TestUtils.Person.BOB, data.CurveTypeRecipient)[0].Id;
-        Assert.Throws<IncompatibleCryptoException>(() =>
+        await Assert.ThrowsAsync<IncompatibleCryptoException>(async () =>
         {
-            didComm.PackEncrypted(
+            await didComm.PackEncrypted(
                 new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, toKid)
                     .From(fromKid)
                     .BuildPackEncryptedParams()
@@ -39,4 +39,3 @@ public class TestToFromDifferentCurves
         });
     }
 }
-

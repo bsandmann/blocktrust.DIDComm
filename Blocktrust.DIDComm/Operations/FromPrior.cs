@@ -11,7 +11,7 @@ using Utils;
 
 public class FromPrior
 {
-    public static (Message, string) PackFromPrior(
+    public static async Task<(Message, string)> PackFromPrior(
         Message message,
         string fromPriorIssuerKid,
         SenderKeySelector keySelector)
@@ -21,7 +21,7 @@ public class FromPrior
         
         if (messageCopy.FromPrior != null)
         {
-            var key = keySelector.FindSigningKey(fromPriorIssuerKid ?? messageCopy.FromPrior.Iss);
+            var key = await keySelector.FindSigningKey(fromPriorIssuerKid ?? messageCopy.FromPrior.Iss);
 
             messageCopy.FromPriorJwt = Jwt.SignJwt(messageCopy.FromPrior.ToJsonObject(), key);
             messageCopy.FromPrior = null;
@@ -34,7 +34,7 @@ public class FromPrior
         }
     }
 
-    public static (Message, string) UnpackFromPrior(Message message, RecipientKeySelector keySelector)
+    public static async Task<(Message, string)> UnpackFromPrior(Message message, RecipientKeySelector keySelector)
     {
         //Make a deep copy of the message
         var messageCopy = message.Copy();
@@ -42,7 +42,7 @@ public class FromPrior
         if (messageCopy.FromPriorJwt != null)
         {
             string issKid = ExtractFromPriorKid(messageCopy.FromPriorJwt);
-            var key = keySelector.FindVerificationKey(issKid);
+            var key = await keySelector.FindVerificationKey(issKid);
             var verified = Jwt.VerifyJwt(messageCopy.FromPriorJwt, key);
             //TODO Inbetween here in the kotlin code this is transformed to a claimsobject with some logic i dont get
             messageCopy.FromPrior = (DIDComm.Message.FromPriors.FromPrior.Parse(verified));

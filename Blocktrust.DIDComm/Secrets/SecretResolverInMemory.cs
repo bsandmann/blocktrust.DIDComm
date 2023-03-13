@@ -21,18 +21,19 @@ public class SecretResolverInMemory : ISecretResolver
         this.secrets = new Dictionary<string, Secret>();
     }
 
-    public Secret? FindKey(string kid)
+    public async Task<Secret?> FindKey(string kid)
     {
         return secrets.ContainsKey(kid) ? secrets[kid] : null;
     }
 
-    public HashSet<string> FindKeys(List<string> kids)
+    public async Task<HashSet<string>> FindKeys(List<string> kids)
     {
         return kids.Intersect(this.secrets.Keys).ToHashSet();
     }
 
-    public void AddKey(string kid, Secret secret)
+    public Task AddKey(string kid, Secret secret)
     {
         secrets.Add(kid, secret);
+        return Task.CompletedTask;
     }
 }
