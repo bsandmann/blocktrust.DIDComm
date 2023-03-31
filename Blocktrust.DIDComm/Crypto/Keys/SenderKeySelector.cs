@@ -78,7 +78,7 @@ public class SenderKeySelector
             var recipients = FindRecipientKeys(didDocTo, to, sender.Curve);
             if (recipients.Count == 0)
             {
-                throw new IncompatibleCryptoException($"The recipient '{to}' curve is not compatible to '{sender.Curve.Name}'");
+                return Result.Fail($"The recipient '{to}' curve is not compatible to '{sender.Curve.Name}'");
             }
 
             return Result.Ok((
@@ -88,7 +88,11 @@ public class SenderKeySelector
         }
         else
         {
-            var didDocFrom = (await _didDocResolver.Resolve(didFrom.First()) ?? throw new DidDocNotResolvedException(didFrom.First()));
+            var didDocFrom = await _didDocResolver.Resolve(didFrom.First());
+            if (didDocFrom is null)
+            {
+                return Result.Fail($"DID '{didFrom.First()}' could not be resolved");
+            }
 
             var keyAgreements = didDocFrom.KeyAgreements.ToList();
             var keyPairList = new List<(Key, List<Key>)>();
@@ -107,7 +111,7 @@ public class SenderKeySelector
 
             if (compatibleKeys.Item1 is null)
             {
-                throw new IncompatibleCryptoException($"The DID Docs '{didDocFrom.Did}' and '{didDocTo.Did}' do not contain compatible 'keyAgreement' verification methods");
+                return Result.Fail($"The DID Docs '{didDocFrom.Did}' and '{didDocTo.Did}' do not contain compatible 'keyAgreement' verification methods");
             }
 
             return compatibleKeys;

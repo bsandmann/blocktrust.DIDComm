@@ -300,14 +300,13 @@ public class EncryptedMessageTests
         var msg = JWMFixture.PLAINTEXT_MESSAGE.Copy();
         msg.From = "did:example:unknown";
 
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(msg, JWMFixture.BOB_DID)
-                    .From("did:example:unknown")
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var result = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(msg, JWMFixture.BOB_DID)
+                .From("did:example:unknown")
+                .BuildPackEncryptedParams()
+        );
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("DID 'did:example:unknown' could not be resolved");
     }
 
     [Fact]

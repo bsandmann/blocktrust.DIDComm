@@ -218,8 +218,9 @@ public class SenderKeySelectorTests
         findAuthCryptKeysResult.IsSuccess.Should().BeFalse();
         findAuthCryptKeysResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
         
-        var exception4 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAuthCryptKeys(did, JWMFixture.ALICE_DID));
-        Assert.Equal(expected, exception4.Message);
+        var findAuthCryptKeysResult2 = await senderKeySelector.FindAuthCryptKeys(did, JWMFixture.ALICE_DID);
+        findAuthCryptKeysResult2.IsSuccess.Should().BeFalse();
+        findAuthCryptKeysResult2.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
     }
 
     [Fact]
@@ -236,11 +237,13 @@ public class SenderKeySelectorTests
         // result2.IsFailed.Should().BeTrue();
         // result2.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods");
         //
-        var exception3 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ELLIE_DID, JWMFixture.BOB_DID));
-        Assert.Equal("The DID Docs '" + JWMFixture.ELLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods", exception3.Message);
+        var result3 = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ELLIE_DID, JWMFixture.BOB_DID);
+        result3.IsFailed.Should().BeTrue();
+        result3.Errors.First().Message.Should().Be("The DID Docs '" + JWMFixture.ELLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods");
         
-        var exception4 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, JWMFixture.ELLIE_DID));
-        Assert.Equal("The DID Docs '" + JWMFixture.ALICE_DID + "' and '" + JWMFixture.ELLIE_DID + "' do not contain compatible 'keyAgreement' verification methods", exception4.Message);
+        var result4 = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, JWMFixture.ELLIE_DID);
+        result4.IsFailed.Should().BeTrue();
+        result4.Errors.First().Message.Should().Be("The DID Docs '" + JWMFixture.ALICE_DID + "' and '" + JWMFixture.ELLIE_DID + "' do not contain compatible 'keyAgreement' verification methods");
     }
 
     [Fact]
@@ -249,11 +252,14 @@ public class SenderKeySelectorTests
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new CharlieSecretResolverMock());
         var bobDIDUrl = "did:example:bob#key-p256-1";
         var charlieDIDUrl = "did:example:charlie#key-x25519-1";
-        var exception1 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.CHARLIE_DID, bobDIDUrl));
-        Assert.Equal("The DID Docs '" + JWMFixture.CHARLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods", exception1.Message);
 
-        var exception2 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(charlieDIDUrl, bobDIDUrl));
-        Assert.Equal("The recipient '" + bobDIDUrl + "' curve is not compatible to 'X25519'", exception2.Message);
+        var result1 = await senderKeySelector.FindAuthCryptKeys(JWMFixture.CHARLIE_DID, bobDIDUrl);
+        result1.IsFailed.Should().BeTrue();
+        result1.Errors.First().Message.Should().Be("The DID Docs '" + JWMFixture.CHARLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods");
+
+        var result2 =  await senderKeySelector.FindAuthCryptKeys(charlieDIDUrl, bobDIDUrl);
+        result2.IsFailed.Should().BeTrue();
+        result2.Errors.First().Message.Should().Be("The recipient '" + bobDIDUrl + "' curve is not compatible to 'X25519'");
     }
 
     [Fact]

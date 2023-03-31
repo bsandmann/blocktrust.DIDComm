@@ -1,6 +1,7 @@
 ﻿namespace Blocktrust.DIDComm.Tests;
 
 using Exceptions;
+using FluentAssertions;
 using Model.PackEncryptedParamsModels;
 using TestData.Fixtures;
 using TestData.Mock;
@@ -29,13 +30,12 @@ public class TestToFromDifferentCurves
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var fromKid = TestUtils.GetKeyAgreementMethodsInSecrets(TestUtils.Person.ALICE, data.CurveTypeSender)[0].Id;
         var toKid = TestUtils.GetKeyAgreementMethodsInSecrets(TestUtils.Person.BOB, data.CurveTypeRecipient)[0].Id;
-        await Assert.ThrowsAsync<IncompatibleCryptoException>(async () =>
-        {
+        var result =
             await didComm.PackEncrypted(
                 new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, toKid)
                     .From(fromKid)
                     .BuildPackEncryptedParams()
             );
-        });
+        result.IsFailed.Should().BeTrue();
     }
 }
