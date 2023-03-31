@@ -51,7 +51,7 @@ public class DidComm
     }
 
 
-    public async Task<PackEncryptedResult> PackEncrypted(PackEncryptedParams param)
+    public async Task<Result<PackEncryptedResult>> PackEncrypted(PackEncryptedParams param)
     {
         var didDocResolver = param.DidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;

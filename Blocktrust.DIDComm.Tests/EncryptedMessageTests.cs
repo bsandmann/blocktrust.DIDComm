@@ -80,7 +80,7 @@ public class EncryptedMessageTests
         // TODO make focused on initial subject (without forward)
         // CHARLIE's first mediator (MEDIATOR2)
         var forwardCharlie = await routing.UnpackForward(
-            packed.PackedMessage,
+            packed.Value.PackedMessage,
             secretResolver: new Mediator2SecretResolverMock()
         );
 

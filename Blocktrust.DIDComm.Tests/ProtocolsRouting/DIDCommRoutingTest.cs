@@ -47,7 +47,7 @@ public class DIDCommRoutingTest
          // BOB MEDIATOR
          // TODO ??? why do we need the recipients selector (question to 'unpack' actually)
          var forwardBob = await _routing.UnpackForward(
-             packResult.PackedMessage,
+             packResult.Value.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
      
@@ -95,7 +95,7 @@ public class DIDCommRoutingTest
          // TODO make focused on initial subject (without forward)
          // CHARLIE's first mediator (MEDIATOR2)
          var forwardCharlie = await _routing.UnpackForward(
-             packResult.PackedMessage,
+             packResult.Value.PackedMessage,
              secretResolver: _mediator2SecretResolver
          );
          
@@ -151,7 +151,7 @@ public class DIDCommRoutingTest
      
          // BOB's MEDIATOR
          var forwardBob = await _routing.UnpackForward(
-             packResult.PackedMessage,
+             packResult.Value.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
      
@@ -214,7 +214,7 @@ public class DIDCommRoutingTest
      
          // BOB's MEDIATOR
          var forwardBob = await _routing.UnpackForward(
-             packResult.PackedMessage,
+             packResult.Value.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
      
@@ -275,7 +275,7 @@ public class DIDCommRoutingTest
     
          // BOB's MEDIATOR
          var forwardBob = await _routing.UnpackForward(
-             packResult.PackedMessage,
+             packResult.Value.PackedMessage,
              secretResolver: _mediator1SecretResolver
          );
     
@@ -331,7 +331,7 @@ public class DIDCommRoutingTest
     
         // BOB's MEDIATOR
         var unpackResultAtMediator =await  _didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(_mediator1SecretResolver)
                 .UnwrapReWrappingForward(true)
                 .BuildUnpackParams()

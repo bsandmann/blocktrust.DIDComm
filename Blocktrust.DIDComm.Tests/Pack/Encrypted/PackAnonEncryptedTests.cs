@@ -45,12 +45,12 @@ public class PackAnonEncryptedTests
         PackEncryptedResult packResult;
         try
         {
-            packResult = await didComm.PackEncrypted(new PackEncryptedParamsBuilder(
+            packResult = (await didComm.PackEncrypted(new PackEncryptedParamsBuilder(
                     message: data.Msg,
                     to: data.To)
                 .SignFrom(data.SignedFrom)
                 .ProtectSenderId(data.ProtectSenderId)
-                .BuildPackEncryptedParams());
+                .BuildPackEncryptedParams())).Value;
         }
         catch (UnsupportedAlgorithmException e)
         {

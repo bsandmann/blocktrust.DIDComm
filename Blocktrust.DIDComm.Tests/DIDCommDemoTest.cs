@@ -40,7 +40,7 @@ public class DIDCommDemoTest
         );
 
         var unpackResult = await didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );
@@ -78,7 +78,7 @@ public class DIDCommDemoTest
         );
 
         var unpackResult = await didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );
@@ -117,7 +117,7 @@ public class DIDCommDemoTest
 
 
         var unpackResult = await didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );
@@ -157,7 +157,7 @@ public class DIDCommDemoTest
         );
     
         var unpackResult = await didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );
@@ -268,7 +268,7 @@ public class DIDCommDemoTest
         );
         
         var unpackResultBob =await  didComm.Unpack(
-            new UnpackParamsBuilder(packResultBob.PackedMessage)
+            new UnpackParamsBuilder(packResultBob.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );
@@ -289,7 +289,7 @@ public class DIDCommDemoTest
         
     
         var forwardCharlie = await routing.UnpackForward(
-            packResultCharlie.PackedMessage,
+            packResultCharlie.Value.PackedMessage,
             secretResolver: new Mediator2SecretResolverMock()
         );
     
@@ -365,7 +365,7 @@ public class DIDCommDemoTest
         );
 
         var unpackResult =await  didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage)
+            new UnpackParamsBuilder(packResult.Value.PackedMessage)
                 .SecretResolver(new BobSecretResolverMock())
                 .BuildUnpackParams()
         );

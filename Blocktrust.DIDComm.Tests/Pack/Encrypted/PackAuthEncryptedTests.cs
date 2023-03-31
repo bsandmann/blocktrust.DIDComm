@@ -94,7 +94,7 @@ public class PackAuthEncryptedTests
         PackEncryptedResult packResult = null;
         try
         {
-            packResult = await didComm.PackEncrypted(
+            packResult = (await didComm.PackEncrypted(
                 new PackEncryptedParamsBuilder(data.Msg, to)
                     .From(from)
                     .SignFrom(data.SignedFrom)
@@ -102,7 +102,7 @@ public class PackAuthEncryptedTests
                     .EncAlgAuth(data.AuthAlg)
                     .EncAlgAnon(data.AnonAlg)
                     .BuildPackEncryptedParams()
-            );
+            )).Value;
         }
         catch (UnsupportedAlgorithmException e)
         {
