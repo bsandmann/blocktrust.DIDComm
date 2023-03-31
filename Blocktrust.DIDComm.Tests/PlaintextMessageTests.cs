@@ -25,10 +25,10 @@ public class PlaintextMessageTests
             new PackPlaintextParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE).BuildPackPlaintext()
         );
 
-        Assert.NotNull(packed.PackedMessage);
+        Assert.NotNull(packed.Value.PackedMessage);
 
         var unpacked =await  didComm.Unpack(
-            new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
         var expected = JWMFixture.PLAINTEXT_MESSAGE;
@@ -55,16 +55,16 @@ public class PlaintextMessageTests
                     .BuildPackPlaintext()
             );
 
-            Assert.NotNull(packResult.PackedMessage);
-            Assert.Equal("did:example:alice#key-2", packResult.FromPriorIssuerKid);
+            Assert.NotNull(packResult.Value.PackedMessage);
+            Assert.Equal("did:example:alice#key-2", packResult.Value.FromPriorIssuerKid);
 
             var unpackResult =await  didComm.Unpack(
-                new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
+                new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
             );
 
             Assert.Equivalent("did:example:alice#key-2", unpackResult.Value.Metadata.FromPriorIssuerKid);
             Assert.Equal(
-                JObject.Parse(packResult.PackedMessage)["from_prior"]?.ToString(),
+                JObject.Parse(packResult.Value.PackedMessage)["from_prior"]?.ToString(),
                 unpackResult.Value.Metadata.FromPriorJwt);
             // Assert.Equivalent(message, unpackResult.Value.Message);
             //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
@@ -87,14 +87,14 @@ public class PlaintextMessageTests
                 new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
             );
 
-            Assert.NotNull(packResult.PackedMessage);
-            Assert.NotNull(packResult.FromPriorIssuerKid);
-            Assert.True(DidUtils.IsDid(packResult.FromPriorIssuerKid));
-            Assert.True(DidUtils.IsDidFragment(packResult.FromPriorIssuerKid));
-            Assert.Equal(JWMFixture.ALICE_DID, DidUtils.DivideDidFragment(packResult.FromPriorIssuerKid).First());
+            Assert.NotNull(packResult.Value.PackedMessage);
+            Assert.NotNull(packResult.Value.FromPriorIssuerKid);
+            Assert.True(DidUtils.IsDid(packResult.Value.FromPriorIssuerKid));
+            Assert.True(DidUtils.IsDidFragment(packResult.Value.FromPriorIssuerKid));
+            Assert.Equal(JWMFixture.ALICE_DID, DidUtils.DivideDidFragment(packResult.Value.FromPriorIssuerKid).First());
 
             var unpackResult =await  didComm.Unpack(
-                new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
+                new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
             );
 
             //TODO
@@ -102,9 +102,9 @@ public class PlaintextMessageTests
             message.Body.Count.Should().Be(unpackResult.Value.Message.Body.Count);
             message.Body.First().Key.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Key);
             message.Body.First().Value.Should().BeEquivalentTo(unpackResult.Value.Message.Body.First().Value?.ToString());
-            Assert.Equal(packResult.FromPriorIssuerKid, unpackResult.Value.Metadata.FromPriorIssuerKid);
+            Assert.Equal(packResult.Value.FromPriorIssuerKid, unpackResult.Value.Metadata.FromPriorIssuerKid);
             Assert.Equal(
-                JObject.Parse(packResult.PackedMessage)["from_prior"],
+                JObject.Parse(packResult.Value.PackedMessage)["from_prior"],
                 unpackResult.Value.Metadata.FromPriorJwt
             );
         }
@@ -190,10 +190,10 @@ public class PlaintextMessageTests
             new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
         );
 
-        Assert.NotNull(packed.PackedMessage);
+        Assert.NotNull(packed.Value.PackedMessage);
 
         var unpacked =await  didComm.Unpack(
-            new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
         var unpackedBody = unpacked.Value.Message.Body;
@@ -221,7 +221,7 @@ public class PlaintextMessageTests
         );
 
         var unpacked =await  didComm.Unpack(
-            new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
         Assert.Null(unpacked.Value.Message.CustomHeader<object>("null"));
@@ -384,7 +384,7 @@ public class PlaintextMessageTests
         );
 
         var unpack =await  didComm.Unpack(
-            new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
         Assert.Equivalent(message.FromPrior, unpack.Value.Message.FromPrior);

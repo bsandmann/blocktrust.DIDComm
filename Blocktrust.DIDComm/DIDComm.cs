@@ -26,7 +26,7 @@ public class DidComm
         this._secretResolver = secretResolver;
     }
 
-    public async Task<PackPlaintextResult> PackPlaintext(PackPlaintextParams param)
+    public async Task<Result<PackPlaintextResult>> PackPlaintext(PackPlaintextParams param)
     {
         var didDocResolver = param.DidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;

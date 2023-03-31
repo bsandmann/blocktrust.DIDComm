@@ -227,7 +227,7 @@ public class DIDCommDemoTest
         );
 
         var unpackResult =await  didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
         );
 
         //The problem is, that the unpacked body consits of objects which are JsonElements and this reference-body consists of objects which are strings
