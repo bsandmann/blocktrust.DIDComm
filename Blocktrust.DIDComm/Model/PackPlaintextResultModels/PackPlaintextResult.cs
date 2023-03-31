@@ -2,10 +2,10 @@
 
 public class PackPlaintextResult
 {
-    public string PackedMessage;
-    public string FromPriorIssuerKid = null;
+    public string PackedMessage { get; }
+    public string? FromPriorIssuerKid { get; }
 
-    public PackPlaintextResult(string packedMessage, string fromPriorIssuerKid = null)
+    public PackPlaintextResult(string packedMessage, string? fromPriorIssuerKid = null)
     {
         this.PackedMessage = packedMessage;
         this.FromPriorIssuerKid = fromPriorIssuerKid;

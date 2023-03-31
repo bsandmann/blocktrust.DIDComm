@@ -2,12 +2,12 @@
 
 public class PackEncryptedResult
 {
-    public string PackedMessage { get; set; }
-    public List<string> ToKids { get; set; }
-    public string? FromKid { get; set; } = null;
-    public string? SignFromKid { get; set; } = null;
-    public string? FromPriorIssuerKid { get; set; } = null;
-    public ServiceMetadata? ServiceMetadata { get; set; } = null;
+    public string PackedMessage { get; }
+    public List<string> ToKids { get; }
+    public string? FromKid { get; }
+    public string? SignFromKid { get; }
+    public string? FromPriorIssuerKid { get; }
+    public ServiceMetadata? ServiceMetadata { get; }
     
     public PackEncryptedResult(string packedMessage, List<string> toKids, string? fromKid, string? signFromKid, string? fromPriorIssuerKid, ServiceMetadata? serviceMetadata)
     {
