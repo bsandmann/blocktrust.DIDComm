@@ -5,10 +5,25 @@ using Message.Messages;
 
 public class PackPlaintextParams
 {
-    public Message Message { get; set; }
-    public string? FromPriorIssuerKid { get; set; } = null;
-    public IDidDocResolver? DidDocResolver { get; set; } = null;
-    public ISecretResolver? SecretResolver { get; set; } = null;
+    /// <summary>
+    /// The message to be packed into a Plaintext DIDComm message.
+    /// </summary>
+    public Message Message { get; }
+    
+    /// <summary>
+    /// Optional FromPrior issuer kid.
+    /// </summary>
+    public string? FromPriorIssuerKid { get; }
+    
+    /// <summary>
+    /// Optional DIDDoc resolver that can override a default DIDDoc resolver.
+    /// </summary>
+    public IDidDocResolver? DidDocResolver { get; }
+    
+    /// <summary>
+    /// Optional Secret resolver that can override a default Secret resolver.
+    /// </summary>
+    public ISecretResolver? SecretResolver { get; }
 
     public PackPlaintextParams(Message message, string? fromPriorIssuerKid = null, IDidDocResolver? didDocResolver = null, ISecretResolver? secretResolver = null)
     {

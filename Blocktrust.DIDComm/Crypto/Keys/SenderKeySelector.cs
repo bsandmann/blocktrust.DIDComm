@@ -10,12 +10,12 @@ using Utils;
 
 public class SenderKeySelector
 {
-    private readonly IDidDocResolver _ididDocResolver;
+    private readonly IDidDocResolver _didDocResolver;
     private readonly ISecretResolver _secretResolver;
 
-    public SenderKeySelector(IDidDocResolver ididDocResolver, ISecretResolver secretResolver)
+    public SenderKeySelector(IDidDocResolver didDocResolver, ISecretResolver secretResolver)
     {
-        this._ididDocResolver = ididDocResolver;
+        this._didDocResolver = didDocResolver;
         this._secretResolver = secretResolver;
     }
 
@@ -28,7 +28,7 @@ public class SenderKeySelector
         }
         else
         {
-            var didDoc = await _ididDocResolver.Resolve(signFrom) ?? throw new DidDocNotResolvedException(signFrom);
+            var didDoc = await _didDocResolver.Resolve(signFrom) ?? throw new DidDocNotResolvedException(signFrom);
             var authentication = didDoc.Authentications.FirstOrDefault() ?? throw new DidDocException($"The DID Doc '{didDoc.Did}' does not contain compatible 'authentication' verification methods");
             var secret = await _secretResolver.FindKey(didDoc.Authentications.FirstOrDefault());
             return Key.FromSecret(secret);
@@ -39,7 +39,7 @@ public class SenderKeySelector
     {
         var didFrom = DidUtils.DivideDidFragment(from);
         var didTo = DidUtils.DivideDidFragment(to);
-        var didDocTo = await _ididDocResolver.Resolve(didTo.First()) ?? throw new DidDocNotResolvedException(didTo.First());
+        var didDocTo = await _didDocResolver.Resolve(didTo.First()) ?? throw new DidDocNotResolvedException(didTo.First());
 
         if (DidUtils.IsDidFragment(from))
         {
@@ -63,7 +63,7 @@ public class SenderKeySelector
         }
         else
         {
-            var didDocFrom = (await _ididDocResolver.Resolve(didFrom.First()) ?? throw new DidDocNotResolvedException(didFrom.First()));
+            var didDocFrom = (await _didDocResolver.Resolve(didFrom.First()) ?? throw new DidDocNotResolvedException(didFrom.First()));
 
             var keyAgreements = didDocFrom.KeyAgreements.ToList();
             var keyPairList = new List<(Key, List<Key>)>();
@@ -91,7 +91,7 @@ public class SenderKeySelector
     public async Task<List<Key>> FindAnonCryptKeys(string to)
     {
         var did = DidUtils.DivideDidFragment(to);
-        var didDoc = await _ididDocResolver.Resolve(did.First()) ?? throw new DidDocNotResolvedException(did.First());
+        var didDoc = await _didDocResolver.Resolve(did.First()) ?? throw new DidDocNotResolvedException(did.First());
 
         return DidUtils.IsDidFragment(to)
             ? new List<Key> { Key.FromVerificationMethod(didDoc.FindVerificationMethod(to)) }

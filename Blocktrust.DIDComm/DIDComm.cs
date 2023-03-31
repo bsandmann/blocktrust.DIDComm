@@ -39,7 +39,7 @@ public class DidComm
 
     public async Task<Result<PackSignedResult>> PackSigned(PackSignedParams param)
     {
-        var didDocResolver = param.IdidDocResolver ?? this._didDocResolver;
+        var didDocResolver = param.DidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
