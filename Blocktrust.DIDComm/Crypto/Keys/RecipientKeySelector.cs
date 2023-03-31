@@ -7,12 +7,12 @@ using Utils;
 
 public class RecipientKeySelector
 {
-    private readonly IDidDocResolver _ididDocResolver;
+    private readonly IDidDocResolver _didDocResolver;
     private readonly ISecretResolver _secretResolver;
 
-    public RecipientKeySelector(IDidDocResolver ididDocResolver, ISecretResolver secretResolver)
+    public RecipientKeySelector(IDidDocResolver didDocResolver, ISecretResolver secretResolver)
     {
-        this._ididDocResolver = ididDocResolver;
+        this._didDocResolver = didDocResolver;
         this._secretResolver = secretResolver;
     }
 
@@ -25,7 +25,7 @@ public class RecipientKeySelector
 
         var did = DidUtils.DivideDidFragment(signFrom);
 
-        var didDoc = await _ididDocResolver.Resolve(did.First());
+        var didDoc = await _didDocResolver.Resolve(did.First());
         if (didDoc == null)
         {
             throw new DidUrlNotFoundException(signFrom, did.First());
@@ -44,7 +44,7 @@ public class RecipientKeySelector
         var did = DidUtils.DivideDidFragment(from);
 
         //TODO modified
-        var didDoc = await _ididDocResolver.Resolve(did.First());
+        var didDoc = await _didDocResolver.Resolve(did.First());
         if (didDoc == null)
         {
             //TODO modified
@@ -60,7 +60,7 @@ public class RecipientKeySelector
 
     public async Task<bool> HasKeysForForwardNext(string next)
     {
-        var nextKids = DidUtils.IsDidFragment(next) ? new List<string> { next } : (await _ididDocResolver.Resolve(next))?.KeyAgreements ?? new List<string>();
+        var nextKids = DidUtils.IsDidFragment(next) ? new List<string> { next } : (await _didDocResolver.Resolve(next))?.KeyAgreements ?? new List<string>();
 
         return (await _secretResolver.FindKeys(nextKids)).Any();
     }

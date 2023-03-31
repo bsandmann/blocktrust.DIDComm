@@ -17,10 +17,13 @@ public class ForwardMessage
         this.ForwardNext = forwardNext;
     }
 
-    public static ForwardMessage FromMessage(Message message)
+    public static ForwardMessage? FromMessage(Message message)
     {
-        var forwardTo =  message.Body.GetTyped<string>("next");
-        if (forwardTo == null) return null;
+        string? forwardTo =  message.Body.GetTyped<string>("next");
+        if (forwardTo is null)
+        {
+            return null;
+        }
 
         //TODO is is aboslute trash
         Json? jsonAttachmentData = (Json)message.Attachments?.FirstOrDefault()?.Data;

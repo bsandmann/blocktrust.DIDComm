@@ -21,30 +21,38 @@ public class Routing
     public const string PROFILE_DIDCOMM_AIP2_ENV_RFC587 = "didcomm/aip2;env=rfc587";
     public const string PROFILE_DIDCOMM_V2 = "didcomm/v2";
 
-    private IDidDocResolver _ididDocResolver;
-    private ISecretResolver _secretResolver;
+    private readonly IDidDocResolver _didDocResolver;
+    private readonly ISecretResolver _secretResolver;
 
-    public Routing(IDidDocResolver ididDocResolver, ISecretResolver secretResolver)
+    public Routing(IDidDocResolver didDocResolver, ISecretResolver secretResolver)
     {
-        this._ididDocResolver = ididDocResolver;
+        this._didDocResolver = didDocResolver;
         this._secretResolver = secretResolver;
     }
 
 
-    public static async Task<List<Service>> ResolveDidCommServicesChain(
-        IDidDocResolver ididDocResolver,
+    public static async Task<Result<List<Service>>> ResolveDidCommServicesChain(
+        IDidDocResolver didDocResolver,
         string to,
-        string serviceId = null,
+        string? serviceId = null,
         bool didRecursion = false
     )
     {
-        var toDidService = await FindDidCommService(ididDocResolver, to, serviceId);
-        if (toDidService == null) return new List<Service>();
+        var toDidService = await FindDidCommService(didDocResolver, to, serviceId);
+        if (toDidService.IsFailed)
+        {
+            return toDidService.ToResult();
+        }
+
+        if (toDidService.Value is null)
+        {
+            return new List<Service>();
+        }
 
         var res = new List<Service>();
-        var serviceUri = toDidService.ServiceEndpoint;
+        var serviceUri = toDidService.Value.ServiceEndpoint;
 
-        res.Insert(0, toDidService);
+        res.Insert(0, toDidService.Value);
 
         while (DidUtils.IsDidOrDidUrl(serviceUri))
         {
@@ -67,23 +75,25 @@ public class Routing
                 }
             }
 
-            var mediatorDidService = await FindDidCommService(ididDocResolver, mediatorDid);
-            if (mediatorDidService == null)
+            var mediatorDidService = await FindDidCommService(didDocResolver, mediatorDid);
+            if (mediatorDidService.IsFailed)
             {
-                throw new DidCommServiceException(
-                    mediatorDid, "mediator '" + mediatorDid + "' service doc not found"
-                );
+                return mediatorDidService.ToResult();
+            }
+            if (mediatorDidService.Value is null)
+            {
+                return Result.Fail("mediator '" + mediatorDid + "' service doc not found");
             }
 
-            serviceUri = mediatorDidService.ServiceEndpoint;
-            res.Insert(0, mediatorDidService);
+            serviceUri = mediatorDidService.Value.ServiceEndpoint;
+            res.Insert(0, mediatorDidService.Value);
         }
 
-        return res;
+        return Result.Ok(res);
     }
 
-    internal static async Task<Service?> FindDidCommService(
-        IDidDocResolver ididDocResolver,
+    private static async Task<Result<Service?>> FindDidCommService(
+        IDidDocResolver didDocResolver,
         string to,
         string? serviceId = null
     )
@@ -92,10 +102,10 @@ public class Routing
         // TODO this copy() is not needed for single tests, but not having it breaks the tests when running in parallel
         // This issue has to be investigated and cleared up before merging
 
-        DidDoc? didDoc = await ididDocResolver.Resolve(toDid).Copy();
+        DidDoc? didDoc = await didDocResolver.Resolve(toDid).Copy();
         if (didDoc is null)
         {
-            throw new DidDocNotResolvedException(toDid);
+            return Result.Fail($"Unable to resolve DID '{toDid}'");
         }
 
         if (serviceId != null)
@@ -104,12 +114,10 @@ public class Routing
 
             if (didService.Accept != null && didService.Accept.Any() && !didService.Accept.Contains(PROFILE_DIDCOMM_V2))
             {
-                throw new DidCommServiceException(
-                    toDid, $"service '{serviceId}' does not accept didcomm/v2 profile"
-                );
+                return Result.Fail($"service '{serviceId}' does not accept didcomm/v2 profile");
             }
 
-            return didService;
+            return Result.Ok<Service?>(didService);
         }
         else
         {
@@ -120,11 +128,11 @@ public class Routing
             // https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
             try
             {
-                return didDoc.Services.FirstOrDefault(it => it.Accept == null || !it.Accept.Any() || it.Accept.Contains(PROFILE_DIDCOMM_V2));
+                return Result.Ok(didDoc.Services.FirstOrDefault(it => it.Accept == null || !it.Accept.Any() || it.Accept.Contains(PROFILE_DIDCOMM_V2)));
             }
             catch (DidDocException e)
             {
-                return null;
+                return Result.Ok<Service?>(null);
             }
         }
     }
@@ -132,39 +140,41 @@ public class Routing
     public async Task<WrapInForwardResult> WrapInForward(
         Dictionary<string, object> packedMsg,
         string to,
-        AnonCryptAlg encAlgAnon = null,
-        List<string> routingKeys = null,
-        Dictionary<string, object> headers = null,
+        AnonCryptAlg? encAlgAnon = null,
+        List<string>? routingKeys = null,
+        Dictionary<string, object>? headers = null,
         IDidDocResolver? didDocResolver = null,
         ISecretResolver? secretResolver = null
     )
     {
-        if (routingKeys == null || routingKeys.Count == 0)
+        if (routingKeys is null || routingKeys.Count == 0)
+        {
             return null;
+        }
 
-        var _didDocResolver = didDocResolver ?? this._ididDocResolver;
-        var _secretResolver = secretResolver ?? this._secretResolver;
-        var keySelector = new SenderKeySelector(_didDocResolver, _secretResolver);
+        var didDocResolverLocal = didDocResolver ?? _didDocResolver;
+        var secretResolverLocal = secretResolver ?? _secretResolver;
+        var keySelector = new SenderKeySelector(didDocResolverLocal, secretResolverLocal);
 
         // TODO
         //  - headers validation against ForwardMessage
         //  - logging
         //  - id generator as an argument
 
-        ForwardMessage fwdMsg = null;
+        ForwardMessage? fwdMsg = null;
         var forwardedMsg = packedMsg;
-        EncryptResult encryptedResult = null;
+        EncryptResult? encryptedResult = null;
 
         //TODO I don't know if this is correct. but it holds some at least one test
         var tos = routingKeys.ToList();
         routingKeys.Reverse();
-        var nexts = routingKeys.Skip(1).ToList();
-        nexts.Add(to);
-        nexts.Reverse();
+        var next = routingKeys.Skip(1).ToList();
+        next.Add(to);
+        next.Reverse();
 
         // wrap forward msgs in reversed order so the message to final
         // recipient 'to' will be the innermost one
-        var toNextZipped = tos.Zip(nexts).ToList();
+        var toNextZipped = tos.Zip(next).ToList();
 
         for (var i = 0; i < toNextZipped.Count; i++)
         {
@@ -221,9 +231,9 @@ public class Routing
         ISecretResolver? secretResolver = null
     )
     {
-        IDidDocResolver ididDocResolver = didDocResolver ?? this._ididDocResolver;
-        ISecretResolver _secretResolver = secretResolver ?? this._secretResolver;
-        RecipientKeySelector recipientKeySelector = new RecipientKeySelector(ididDocResolver, _secretResolver);
+        IDidDocResolver didDocResolverLocal = didDocResolver ?? this._didDocResolver;
+        ISecretResolver secretResolverLocal = secretResolver ?? this._secretResolver;
+        RecipientKeySelector recipientKeySelector = new RecipientKeySelector(didDocResolverLocal, secretResolverLocal);
 
         var unpackResult = await Unpacker.Unpack(
             new UnpackParamsBuilder(packedMessage)

@@ -185,22 +185,26 @@ public class DidComm
 
         // TODO make that (along with service metadata) as
         //      an internal part of routing routine
-        var didServicesChain = await Routing.ResolveDidCommServicesChain(
+        var didServicesChainResult = await Routing.ResolveDidCommServicesChain(
             didDocResolver, param.To, param.ForwardServiceId
         );
+        if (didServicesChainResult.IsFailed)
+        {
+            return didServicesChainResult.ToResult();
+        } 
 
         var wrapInForwardResult = await PackEncrypt.WrapInForwardIfNeeded(
-            encryptResult.PackedMessage, param, didServicesChain, didDocResolver, secretResolver
+            encryptResult.PackedMessage, param, didServicesChainResult.Value, didDocResolver, secretResolver
         );
 
         if (wrapInForwardResult != null)
             encryptResult.PackedMessage = wrapInForwardResult.MsgEncrypted.PackedMessage;
 
-        var serviceMetadata = !didServicesChain.Any()
+        var serviceMetadata = !didServicesChainResult.Value.Any()
             ? null
             : new ServiceMetadata(
-                didServicesChain.Last().Id,
-                didServicesChain.First().ServiceEndpoint
+                didServicesChainResult.Value.Last().Id,
+                didServicesChainResult.Value.First().ServiceEndpoint
             );
 
         return Result.Ok(new PackEncryptedResult(
