@@ -40,8 +40,13 @@ public class SenderKeySelector
                 return Result.Fail($"DID '{signFrom}' could not be resolved");
             }
 
-            var authentication = didDoc.Authentications.FirstOrDefault() ?? throw new DidDocException($"The DID Doc '{didDoc.Did}' does not contain compatible 'authentication' verification methods");
-            var secret = await _secretResolver.FindKey(didDoc.Authentications.FirstOrDefault());
+            var authentication = didDoc.Authentications.FirstOrDefault();
+            if (authentication is null)
+            {
+                return Result.Fail($"The DID Doc '{didDoc.Did}' does not contain compatible 'authentication' verification methods");
+            }
+
+            var secret = await _secretResolver.FindKey(didDoc.Authentications.First());
             if (secret is null)
             {
                 return Result.Fail($"Unable to find secret for signing of '{signFrom}'");

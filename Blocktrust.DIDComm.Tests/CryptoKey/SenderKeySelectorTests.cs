@@ -163,8 +163,9 @@ public class SenderKeySelectorTests
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        var exception = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindSigningKey(JWMFixture.BOB_DID));
-        Assert.Equal($"The DID Doc '{JWMFixture.BOB_DID}' does not contain compatible 'authentication' verification methods", exception.Message);
+        var result = await senderKeySelector.FindSigningKey(JWMFixture.BOB_DID);
+        result.IsSuccess.Should().BeFalse();
+        result.Errors.First().Message.Should().Be($"The DID Doc '{JWMFixture.BOB_DID}' does not contain compatible 'authentication' verification methods");
     }
 
     [Fact]
@@ -225,15 +226,19 @@ public class SenderKeySelectorTests
     public async Task Test_empty_DID_Doc()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        var exception1 = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindSigningKey(JWMFixture.ELLIE_DID));
-        Assert.Equal("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'authentication' verification methods", exception1.Message);
+        var result1 = await senderKeySelector.FindSigningKey(JWMFixture.ELLIE_DID);
+        result1.IsFailed.Should().BeTrue();
+        result1.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'authentication' verification methods");
 
         var exception2 = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID));
         Assert.Equal("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods", exception2.Message);
-
+        // var result2 =  await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID);
+        // result2.IsFailed.Should().BeTrue();
+        // result2.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods");
+        //
         var exception3 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ELLIE_DID, JWMFixture.BOB_DID));
         Assert.Equal("The DID Docs '" + JWMFixture.ELLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods", exception3.Message);
-
+        
         var exception4 = await Assert.ThrowsAsync<IncompatibleCryptoException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, JWMFixture.ELLIE_DID));
         Assert.Equal("The DID Docs '" + JWMFixture.ALICE_DID + "' and '" + JWMFixture.ELLIE_DID + "' do not contain compatible 'keyAgreement' verification methods", exception4.Message);
     }
