@@ -27,7 +27,7 @@ public class PlaintextMessageTests
 
         Assert.NotNull(packed.Value.PackedMessage);
 
-        var unpacked =await  didComm.Unpack(
+        var unpacked = await didComm.Unpack(
             new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
@@ -58,7 +58,7 @@ public class PlaintextMessageTests
             Assert.NotNull(packResult.Value.PackedMessage);
             Assert.Equal("did:example:alice#key-2", packResult.Value.FromPriorIssuerKid);
 
-            var unpackResult =await  didComm.Unpack(
+            var unpackResult = await didComm.Unpack(
                 new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
             );
 
@@ -93,7 +93,7 @@ public class PlaintextMessageTests
             Assert.True(DidUtils.IsDidFragment(packResult.Value.FromPriorIssuerKid));
             Assert.Equal(JWMFixture.ALICE_DID, DidUtils.DivideDidFragment(packResult.Value.FromPriorIssuerKid).First());
 
-            var unpackResult =await  didComm.Unpack(
+            var unpackResult = await didComm.Unpack(
                 new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
             );
 
@@ -115,13 +115,16 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceRotatedToCharlieSecretResolverMock());
 
-        foreach (var message in JWMFixture.INVALID_FROM_PRIOR_PLAINTEXT_MESSAGES)
+        //The first message must be handle seperatly in the rewrite-phase
+        var message0 = JWMFixture.INVALID_FROM_PRIOR_PLAINTEXT_MESSAGES.First();
+        var packPlaintextResult = await didComm.PackPlaintext(new PackPlaintextParamsBuilder(message0).BuildPackPlaintext());
+        packPlaintextResult.IsSuccess.Should().BeFalse();
+        packPlaintextResult.Errors.First().Message.Should().Be("DID 'invalid' could not be resolved");
+
+        foreach (var message in JWMFixture.INVALID_FROM_PRIOR_PLAINTEXT_MESSAGES.Skip(1))
         {
-            await Assert.ThrowsAnyAsync<Exception>(async () => { await didComm.PackPlaintext(new PackPlaintextParamsBuilder(message).BuildPackPlaintext());});
+            await Assert.ThrowsAnyAsync<Exception>(async () => { await didComm.PackPlaintext(new PackPlaintextParamsBuilder(message).BuildPackPlaintext()); });
         }
-
-
-
     }
 
     [Fact]
@@ -129,7 +132,7 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceRotatedToCharlieSecretResolverMock());
 
-        var unpackResult =await  didComm.Unpack(
+        var unpackResult = await didComm.Unpack(
             new UnpackParamsBuilder(JWMFixture.PACKED_MESSAGE_FROM_PRIOR).BuildUnpackParams()
         );
 
@@ -152,7 +155,7 @@ public class PlaintextMessageTests
 
         foreach (var tv in JWMFixture.WRONG_FROM_PRIOR_PACKED_MESSAGES)
         {
-            var result =await  didComm.Unpack(
+            var result = await didComm.Unpack(
                 new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
             );
 
@@ -166,11 +169,11 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        var result =await  didComm.Unpack(
+        var result = await didComm.Unpack(
             new UnpackParamsBuilder(JWMFixture.PACKED_MESSAGE_WITHOUT_BODY).BuildUnpackParams()
         );
 
-            Assert.False(result.IsSuccess);
+        Assert.False(result.IsSuccess);
         Assert.Contains("The header \"body\" is missing", result.Errors.First().Message);
     }
 
@@ -192,7 +195,7 @@ public class PlaintextMessageTests
 
         Assert.NotNull(packed.Value.PackedMessage);
 
-        var unpacked =await  didComm.Unpack(
+        var unpacked = await didComm.Unpack(
             new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
@@ -220,7 +223,7 @@ public class PlaintextMessageTests
             new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
         );
 
-        var unpacked =await  didComm.Unpack(
+        var unpacked = await didComm.Unpack(
             new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 
@@ -255,7 +258,7 @@ public class PlaintextMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        var result =await  didComm.Unpack(
+        var result = await didComm.Unpack(
             new UnpackParamsBuilder("{}").BuildUnpackParams()
         );
 
@@ -270,7 +273,7 @@ public class PlaintextMessageTests
 
         foreach (var tv in JWMFixture.WRONG_ATTACHMENTS)
         {
-            var result =await  didComm.Unpack(
+            var result = await didComm.Unpack(
                 new UnpackParamsBuilder(tv.Json).BuildUnpackParams()
             );
 
@@ -383,7 +386,7 @@ public class PlaintextMessageTests
             new PackPlaintextParamsBuilder(message).BuildPackPlaintext()
         );
 
-        var unpack =await  didComm.Unpack(
+        var unpack = await didComm.Unpack(
             new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
         );
 

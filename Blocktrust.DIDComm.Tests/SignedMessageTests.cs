@@ -2,6 +2,7 @@
 
 using Crypto.JWS;
 using Exceptions;
+using FluentAssertions;
 using Model.PackSignedParamsModels;
 using Model.UnpackParamsModels;
 using TestData.Fixtures;
@@ -13,34 +14,33 @@ public class SignedMessageTests
     [Fact]
     public async Task Test_signed_message_test_vectors()
     {
-    
         foreach (var test in JWSFixture.TEST_VECTORS)
         {
             var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
-    
+
             var packed = await didComm.PackSigned(
                 new PackSignedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, test.from).BuildPackSginedParams()
             );
-    
+
             var unpacked = await didComm.Unpack(
                 new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
             );
-    
+
             //TODO unclear if correctly converted
             var expectedDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(test.expected);
             var expected = JwsObject.Parse(expectedDictionary);
             var signedDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(packed.Value.PackedMessage);
             var signed = JwsObject.Parse(signedDictionary);
-            
+
             //TODO reactivate this test
             // Assert.Equal(expected.JwsTokenSignatures.First().Header.ToString(), signed.JwsTokenSignatures.First().Header.ToString());
-            
+
             //TODO very much unclear if correctly converted
             Assert.Equal(
                 JWMFixture.PLAINTEXT_MESSAGE.ToString(),
                 unpacked.Value.Message.ToString()
             );
-            
+
             Assert.Equal(false, unpacked.Value.Metadata.Encrypted);
             Assert.Equal(true, unpacked.Value.Metadata.Authenticated);
             Assert.Equal(true, unpacked.Value.Metadata.NonRepudiation);
@@ -58,7 +58,7 @@ public class SignedMessageTests
 
         await Assert.ThrowsAsync<DidCommIllegalArgumentException>(async () =>
         {
-           await didComm.PackSigned(
+            await didComm.PackSigned(
                 new PackSignedParamsBuilder(
                     JWMFixture.PLAINTEXT_MESSAGE,
                     signFrom: "not-a-did"
@@ -87,15 +87,14 @@ public class SignedMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-          await  didComm.PackSigned(
-                new PackSignedParamsBuilder(
-                    JWMFixture.PLAINTEXT_MESSAGE,
-                    signFrom: JWMFixture.ALICE_DID + "#unknown-key"
-                ).BuildPackSginedParams()
-            );
-        });
+        var packResult = await didComm.PackSigned(
+            new PackSignedParamsBuilder(
+                JWMFixture.PLAINTEXT_MESSAGE,
+                signFrom: JWMFixture.ALICE_DID + "#unknown-key"
+            ).BuildPackSginedParams()
+        );
+        packResult.IsFailed.Should().BeTrue();
+        packResult.Errors.First().Message.Should().Be("Unable to find secret for signing of 'did:example:alice#unknown-key'");
     }
 
     [Fact]
@@ -103,14 +102,13 @@ public class SignedMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
         var frm = TestUtils.GetAuthMethodsNotInSecrets(TestUtils.Person.ALICE)[0].Id;
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-          await  didComm.PackSigned(
-                new PackSignedParamsBuilder(
-                    JWMFixture.PLAINTEXT_MESSAGE,
-                    signFrom: frm
-                ).BuildPackSginedParams()
-            );
-        });
+        var packResult = await didComm.PackSigned(
+            new PackSignedParamsBuilder(
+                JWMFixture.PLAINTEXT_MESSAGE,
+                signFrom: frm
+            ).BuildPackSginedParams()
+        );
+        packResult.IsFailed.Should().BeTrue();
+        packResult.Errors.First().Message.Should().Be("Unable to find secret for signing of 'did:example:alice#key-not-in-secrets-1'");
     }
 }

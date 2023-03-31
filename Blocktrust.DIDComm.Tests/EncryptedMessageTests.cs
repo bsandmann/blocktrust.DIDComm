@@ -19,7 +19,7 @@ public class EncryptedMessageTests
         foreach (var tv in JWEFixture.TEST_VECTORS)
         {
             var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
-            var unpacked =await  didComm.Unpack(
+            var unpacked = await didComm.Unpack(
                 new UnpackParamsBuilder(tv.message)
                     .ExpectDecryptByAllKeys(true)
                     .BuildUnpackParams()
@@ -56,7 +56,7 @@ public class EncryptedMessageTests
         foreach (var tv in testVectors)
         {
             var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
-            await Assert.ThrowsAsync<UnsupportedAlgorithmException>(async () =>await  didComm.Unpack(
+            await Assert.ThrowsAsync<UnsupportedAlgorithmException>(async () => await didComm.Unpack(
                 new UnpackParamsBuilder(tv.message)
                     .ExpectDecryptByAllKeys(true)
                     .BuildUnpackParams()
@@ -95,7 +95,7 @@ public class EncryptedMessageTests
         forwardedMsg = forwardCharlie.Value.ForwardMsg.ForwardedMsg.ToJsonString();
 
         // CHARLIE
-        var unpacked =await  didComm.Unpack(
+        var unpacked = await didComm.Unpack(
             new UnpackParamsBuilder(forwardedMsg)
                 .SecretResolver(new CharlieSecretResolverMock())
                 .ExpectDecryptByAllKeys(true)
@@ -118,10 +118,10 @@ public class EncryptedMessageTests
         var expected = "Decrypt is failed";
 
         var result = await didComm.Unpack(
-                new UnpackParamsBuilder(JWEFixture.BOB_DAMAGED_MESSAGE)
-                    .ExpectDecryptByAllKeys(true)
-                    .BuildUnpackParams()
-            );
+            new UnpackParamsBuilder(JWEFixture.BOB_DAMAGED_MESSAGE)
+                .ExpectDecryptByAllKeys(true)
+                .BuildUnpackParams()
+        );
 
         result.IsFailed.Should().BeTrue();
         Assert.Contains(expected, result.Errors.First().Message);
@@ -133,7 +133,7 @@ public class EncryptedMessageTests
         var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
         var expected = new List<string> { "did:example:bob#key-x25519-2" };
 
-        var unpack =await  didComm.Unpack(
+        var unpack = await didComm.Unpack(
             new UnpackParamsBuilder(JWEFixture.BOB_DAMAGED_MESSAGE)
                 .BuildUnpackParams()
         );
@@ -149,7 +149,7 @@ public class EncryptedMessageTests
             var didComm = new DidComm(new DidDocResolverMock(), new BobSecretResolverMock());
 
 
-            var result =await  didComm.Unpack(tv.unpackParams);
+            var result = await didComm.Unpack(tv.unpackParams);
             result.IsFailed.Should().BeTrue();
             result.Errors.First().Message.Should().Contain($"{tv.expectedMessage}");
         }
@@ -361,15 +361,14 @@ public class EncryptedMessageTests
     public async Task Test_signFrom_unknown_did()
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
-                    .From(JWMFixture.ALICE_DID)
-                    .SignFrom("did:example:unknown")
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var packResult = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
+                .From(JWMFixture.ALICE_DID)
+                .SignFrom("did:example:unknown")
+                .BuildPackEncryptedParams()
+        );
+        packResult.IsFailed.Should().BeTrue();
+        packResult.Errors.First().Message.Should().Be("DID 'did:example:unknown' could not be resolved");
     }
 
     [Fact]
@@ -377,15 +376,12 @@ public class EncryptedMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
-                    .From(JWMFixture.ALICE_DID)
-                    .SignFrom(JWMFixture.ALICE_DID + "#unknown-key")
-                    .BuildPackEncryptedParams()
-            );
-        });
+        await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
+                .From(JWMFixture.ALICE_DID)
+                .SignFrom(JWMFixture.ALICE_DID + "#unknown-key")
+                .BuildPackEncryptedParams()
+        );
     }
 
     [Fact]
@@ -409,15 +405,14 @@ public class EncryptedMessageTests
         var didComm = new DidComm(new DidDocResolverMockWithNoSecrets(), new AliceSecretResolverMock());
 
         var frm = TestUtils.GetKeyAgreementMethodsNotInSecrets(TestUtils.Person.ALICE)[0].Id;
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
-                    .From(JWMFixture.ALICE_DID)
-                    .SignFrom(frm)
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var packEncryptedResult = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
+                .From(JWMFixture.ALICE_DID)
+                .SignFrom(frm)
+                .BuildPackEncryptedParams()
+        );
+        packEncryptedResult.IsFailed.Should().BeTrue();
+        packEncryptedResult.Errors.First().Message.Should().Be("Unable to find secret for signing of 'did:example:alice#key-x25519-not-in-secrets-1'");
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using Blocktrust.Common.Models.DidDoc;
 using Blocktrust.Common.Models.Secrets;
 using Blocktrust.Common.Resolver;
 using Exceptions;
+using FluentResults;
 using Utils;
 
 public class SenderKeySelector
@@ -19,19 +20,33 @@ public class SenderKeySelector
         this._secretResolver = secretResolver;
     }
 
-    public async Task<Key> FindSigningKey(string signFrom)
+    public async Task<Result<Key>> FindSigningKey(string signFrom)
     {
         if (DidUtils.IsDidFragment(signFrom))
         {
-            var secret = await _secretResolver.FindKey(signFrom) ?? throw new SecretNotFoundException(signFrom);
-            return Key.FromSecret(secret);
+            var secret = await _secretResolver.FindKey(signFrom);
+            if (secret is null)
+            {
+                return Result.Fail($"Unable to find secret for signing of '{signFrom}'");
+            }
+
+            return Result.Ok(Key.FromSecret(secret!));
         }
         else
         {
-            var didDoc = await _didDocResolver.Resolve(signFrom) ?? throw new DidDocNotResolvedException(signFrom);
+            var didDoc = await _didDocResolver.Resolve(signFrom);
+            if (didDoc is null)
+            {
+                return Result.Fail($"DID '{signFrom}' could not be resolved");
+            }
             var authentication = didDoc.Authentications.FirstOrDefault() ?? throw new DidDocException($"The DID Doc '{didDoc.Did}' does not contain compatible 'authentication' verification methods");
             var secret = await _secretResolver.FindKey(didDoc.Authentications.FirstOrDefault());
-            return Key.FromSecret(secret);
+            if (secret is null)
+            {
+                return Result.Fail($"Unable to find secret for signing of '{signFrom}'");
+            }
+
+            return Result.Ok(Key.FromSecret(secret!));
         }
     }
 
@@ -76,6 +91,7 @@ public class SenderKeySelector
                     keyPairList.Add(keyPair);
                 }
             }
+
             var compatibleKeys = keyPairList.FirstOrDefault(pair => pair.Item2.Any());
 
 

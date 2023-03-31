@@ -4,6 +4,7 @@ using Blocktrust.Common.Exceptions;
 using Crypto.JWE;
 using Crypto.Keys;
 using Exceptions;
+using FluentAssertions;
 using TestData.DIDDoc;
 using TestData.Fixtures;
 using TestData.Mock;
@@ -43,7 +44,7 @@ public class SenderKeySelectorTests
         var key = await senderKeySelector.FindSigningKey(JWMFixture.ALICE_DID);
 
         var expected = "did:example:alice#key-1";
-        Assert.Equal(expected, key.Id);
+        Assert.Equal(expected, key.Value.Id);
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class SenderKeySelectorTests
         var key = await senderKeySelector.FindSigningKey("did:example:alice#key-2");
 
         var expected = "did:example:alice#key-2";
-        Assert.Equal(expected, key.Id);
+        Assert.Equal(expected, key.Value.Id);
     }
 
     [Fact]
@@ -167,8 +168,9 @@ public class SenderKeySelectorTests
         var expected = "The Secret 'did:example:alice#key-x25519-3' not found";
         var didUrl = "did:example:alice#key-x25519-3";
 
-        var exception1 = await Assert.ThrowsAsync<SecretNotFoundException>(async () => await senderKeySelector.FindSigningKey(didUrl));
-        Assert.Equal(expected, exception1.Message);
+        var findSigningKeyResult =  await senderKeySelector.FindSigningKey(didUrl);
+        findSigningKeyResult.IsSuccess.Should().BeFalse();
+        findSigningKeyResult.Errors.First().Message.Should().Be("Unable to find secret for signing of 'did:example:alice#key-x25519-3'");
         var exception2 = await Assert.ThrowsAsync<SecretNotFoundException>(async () => await senderKeySelector.FindAuthCryptKeys(didUrl, "did:example:bob#key-x25519-1"));
         Assert.Equal(expected, exception2.Message);
         var exception3 = await Assert.ThrowsAsync<SecretNotFoundException>(async () => await senderKeySelector.FindAuthCryptKeys(didUrl, JWMFixture.BOB_DID));
@@ -195,8 +197,10 @@ public class SenderKeySelectorTests
         var did = JWMFixture.NONA_DID;
         var expected = $"The DID Doc '{did}' not resolved";
 
-        var exception1 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindSigningKey(did));
-        Assert.Equal(expected, exception1.Message);
+        var findSigningKeyResult = await senderKeySelector.FindSigningKey(did);
+        findSigningKeyResult.IsSuccess.Should().BeFalse();
+        findSigningKeyResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
+        
         var exception2 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAnonCryptKeys(did));
         Assert.Equal(expected, exception2.Message);
         var exception3 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, did));

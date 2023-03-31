@@ -47,8 +47,14 @@ public class DidComm
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        // var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        var packFromPriorResult = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        if (packFromPriorResult.IsFailed)
+        {
+            return packFromPriorResult.ToResult();
+        }
 
+        var (message, fromPriorIssuerKid) = packFromPriorResult.Value;
         return Result.Ok(new PackPlaintextResult(message.ToString(), fromPriorIssuerKid));
     }
 
@@ -78,11 +84,22 @@ public class DidComm
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        var packFromPriorResult = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        if (packFromPriorResult.IsFailed)
+        {
+            return packFromPriorResult.ToResult();
+        }
+        var (message, fromPriorIssuerKid) = packFromPriorResult.Value;
+        
         var signFromKey = await senderKeySelector.FindSigningKey(param.SignFrom);
-        var msg = Jws.Sign(message.ToString(), signFromKey);
+        if (signFromKey.IsFailed)
+        {
+            return signFromKey.ToResult();
+        }
 
-        return Result.Ok(new PackSignedResult(msg, signFromKey.Id, fromPriorIssuerKid));
+        var msg = Jws.Sign(message.ToString(), signFromKey.Value);
+
+        return Result.Ok(new PackSignedResult(msg, signFromKey.Value.Id, fromPriorIssuerKid));
     }
 
     /// <summary>
@@ -143,8 +160,20 @@ public class DidComm
         var secretResolver = param.SecretResolver ?? this._secretResolver;
         var senderKeySelector = new SenderKeySelector(didDocResolver, secretResolver);
 
-        var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
-        var (payload, signFromKid) = await Operations.PackEncrypt.SignIfNeeded(message.ToString(), param, senderKeySelector);
+        var packFromPriorResult = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
+        if (packFromPriorResult.IsFailed)
+        {
+            return packFromPriorResult.ToResult();
+        }
+        
+        var (message, fromPriorIssuerKid) = packFromPriorResult.Value;
+        var signResult = await Operations.PackEncrypt.SignIfNeeded(message.ToString(), param, senderKeySelector);
+        if (signResult.IsFailed)
+        {
+            return signResult.ToResult();
+        }
+
+        var (payload, signFromKid) = signResult.Value;
         var (encryptedResult, recipientKeys) = await PackEncrypt.Encrypt(param, payload, senderKeySelector);
         var encryptResult = PackEncrypt.ProtectSenderIfNeeded(param, encryptedResult, recipientKeys);
 

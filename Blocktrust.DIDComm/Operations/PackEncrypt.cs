@@ -5,18 +5,23 @@ using Blocktrust.Common.Resolver;
 using Crypto.JWE;
 using Crypto.JWS;
 using Crypto.Keys;
+using FluentResults;
 using Model.PackEncryptedParamsModels;
 using ProtocolsRouting.Routing;
 using Utils;
 
 public class PackEncrypt
 {
-    public static async Task<(string, string?)> SignIfNeeded(string message, PackEncryptedParams param, SenderKeySelector keySelector)
+    public static async Task<Result<(string, string?)>> SignIfNeeded(string message, PackEncryptedParams param, SenderKeySelector keySelector)
     {
         if (param.SignFrom != null)
         {
-            var key = await keySelector.FindSigningKey(param.SignFrom);
-            return (Jws.Sign(message, key), key.Id);
+            var keyResult = await keySelector.FindSigningKey(param.SignFrom);
+            if (keyResult.IsFailed)
+            {
+                return keyResult.ToResult();
+            }
+            return (Jws.Sign(message, keyResult.Value), keyResult.Value.Id);
         }
         else
         {

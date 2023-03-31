@@ -6,12 +6,13 @@ using Blocktrust.Common.Converter;
 using Crypto.JWT;
 using Crypto.Keys;
 using Exceptions;
+using FluentResults;
 using Message.Messages;
 using Utils;
 
 public static class FromPrior
 {
-    public static async Task<(Message, string?)> PackFromPrior(
+    public static async Task<Result<(Message, string?)>> PackFromPrior(
         Message message,
         string? fromPriorIssuerKid,
         SenderKeySelector keySelector)
@@ -21,12 +22,16 @@ public static class FromPrior
         
         if (messageCopy.FromPrior is not null)
         {
-            var key = await keySelector.FindSigningKey(fromPriorIssuerKid ?? messageCopy.FromPrior.Iss);
+            var keyResult = await keySelector.FindSigningKey(fromPriorIssuerKid ?? messageCopy.FromPrior.Iss);
+            if (keyResult.IsFailed)
+            {
+                return keyResult.ToResult();
+            }
 
-            messageCopy.FromPriorJwt = Jwt.SignJwt(messageCopy.FromPrior!.ToJsonObject(), key);
+            messageCopy.FromPriorJwt = Jwt.SignJwt(messageCopy.FromPrior!.ToJsonObject(), keyResult.Value);
             messageCopy.FromPrior = null;
 
-            return (messageCopy, key.Id);
+            return (messageCopy, keyResult.Value.Id);
         }
         else
         {
