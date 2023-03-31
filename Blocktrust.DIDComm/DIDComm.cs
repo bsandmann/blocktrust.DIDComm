@@ -82,14 +82,14 @@ public class DidComm
                 didServicesChain.First().ServiceEndpoint
             );
 
-        return new PackEncryptedResult(
+        return Result.Ok(new PackEncryptedResult(
             encryptResult.PackedMessage,
             encryptedResult.ToKids,
             encryptedResult.FromKid,
             signFromKid,
             fromPriorIssuerKid,
             serviceMetadata
-        );
+        ));
     }
 
     public async Task<Result<UnpackResult>> Unpack(UnpackParams param)
