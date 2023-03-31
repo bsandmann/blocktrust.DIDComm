@@ -85,8 +85,6 @@ public class SecretUtils
 
     private static string KeyIdFromSha256Thumbprint(string crv, string x, string kty)
     {
-        x = "F9KF2ZRcfBbJfiZFsDZvkqwU23eo4cVeeF-XUhSOZAQ";
-        
         // Put mandatory params in sorted order
         var requiredParams = new SortedDictionary<string, string>();
         requiredParams.Add("crv", crv);

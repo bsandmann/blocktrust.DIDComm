@@ -8,7 +8,7 @@ public sealed class JweParseResult : ParseResult
 {
     public readonly JweObject Message;
 
-    public JweParseResult(Dictionary<string, object> rawMessage)
+    public JweParseResult(Dictionary<string, object?> rawMessage)
     {
         try
         {
@@ -16,7 +16,7 @@ public sealed class JweParseResult : ParseResult
             if (rawMessage.ContainsKey("protected"))
             {
                 var protectedHeader = rawMessage["protected"];
-                jwe.UnprotectedHeader =   JweHeader.Parse(protectedHeader.ToString()); 
+                jwe.UnprotectedHeader = JweHeader.Parse(protectedHeader.ToString());
             }
             else
             {
@@ -25,7 +25,7 @@ public sealed class JweParseResult : ParseResult
 
             if (rawMessage.ContainsKey("ciphertext"))
             {
-                var ciphertext =(JsonElement) rawMessage["ciphertext"];
+                var ciphertext = (JsonElement)rawMessage["ciphertext"];
                 //TODO do i have to use jsonelement here again?
                 jwe.CipherText = (string)ciphertext.GetString();
             }
@@ -36,14 +36,14 @@ public sealed class JweParseResult : ParseResult
 
             if (rawMessage.ContainsKey("tag"))
             {
-                var tag =(JsonElement) rawMessage["tag"];
-            
+                var tag = (JsonElement)rawMessage["tag"];
+
                 jwe.AuthTag = (string)tag.GetString();
             }
 
             if (rawMessage.ContainsKey("iv"))
             {
-                var iv =(JsonElement) rawMessage["iv"];
+                var iv = (JsonElement)rawMessage["iv"];
                 jwe.Iv = (string)iv.GetString();
             }
 
@@ -81,7 +81,7 @@ public sealed class JweParseResult : ParseResult
                                 }
                             }
 
-                            var r = new JweRecipientCustom(header,encryptedKey);
+                            var r = new JweRecipientCustom(header, encryptedKey);
                             jwe.Recipients.Add(r);
                         }
                     }
@@ -90,13 +90,12 @@ public sealed class JweParseResult : ParseResult
                 {
                     throw new NotImplementedException();
                 }
-                
-                
             }
-            //TODO the jose-jwt might be supporting parsing to a jweToken
-            //NOW tranfform the JWE token to the JWE object??
+
+            // TODO the jose-jwt might be supporting parsing to a jweToken
+            // NOW transform the JWE token to the JWE object??
             this.Message = jwe;
-            //TODO acturyll not so sure if this is corret here. but i need it later
+            // TODO actually not so sure if this is correct here. but i need it later
             this.Message.State = JweTokenState.Encrypted;
         }
         catch (Exception e)
