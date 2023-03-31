@@ -6,7 +6,7 @@
         <RootNamespace>Blocktrust.DIDComm</RootNamespace>
         <TargetFramework>net7.0</TargetFramework>
         <PublishTrimmed>true</PublishTrimmed>
-        <Version>2.1.1</Version>
+        <Version>2.2.0</Version>
         <Authors>Bjoern Sandmann / blocktrust</Authors>
         <Description>Port of the SICPA DIDComm v2 implementation to .net</Description>
         <Copyright>Bjoern Sandmann / blocktrust</Copyright>
