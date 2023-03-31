@@ -315,14 +315,13 @@ public class EncryptedMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMock(), new AliceSecretResolverMock());
 
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
-                    .From(JWMFixture.ALICE_DID + "#unknown-key")
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var result = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
+                .From(JWMFixture.ALICE_DID + "#unknown-key")
+                .BuildPackEncryptedParams()
+        );
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("Unable to find secret of 'did:example:alice#unknown-key'");
     }
 
     [Fact]
@@ -332,14 +331,13 @@ public class EncryptedMessageTests
         var msg = JWMFixture.PLAINTEXT_MESSAGE.Copy();
         msg.To = new List<string> { "did:example:unknown" };
 
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(msg, "did:example:unknown")
-                    .From(JWMFixture.ALICE_DID)
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var result = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(msg, "did:example:unknown")
+                .From(JWMFixture.ALICE_DID)
+                .BuildPackEncryptedParams()
+        );
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("DID 'did:example:unknown' could not be resolved");
     }
 
     [Fact]
@@ -389,14 +387,13 @@ public class EncryptedMessageTests
     {
         var didComm = new DidComm(new DidDocResolverMockWithNoSecrets(), new AliceSecretResolverMock());
         var frm = TestUtils.GetKeyAgreementMethodsNotInSecrets(TestUtils.Person.ALICE)[0].Id;
-        await Assert.ThrowsAsync<SecretNotFoundException>(async () =>
-        {
-            await didComm.PackEncrypted(
-                new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
-                    .From(frm)
-                    .BuildPackEncryptedParams()
-            );
-        });
+        var result = await didComm.PackEncrypted(
+            new PackEncryptedParamsBuilder(JWMFixture.PLAINTEXT_MESSAGE, JWMFixture.BOB_DID)
+                .From(frm)
+                .BuildPackEncryptedParams()
+        );
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("Unable to find secret of 'did:example:alice#key-x25519-not-in-secrets-1'");
     }
 
     [Fact]

@@ -39,6 +39,7 @@ public class SenderKeySelector
             {
                 return Result.Fail($"DID '{signFrom}' could not be resolved");
             }
+
             var authentication = didDoc.Authentications.FirstOrDefault() ?? throw new DidDocException($"The DID Doc '{didDoc.Did}' does not contain compatible 'authentication' verification methods");
             var secret = await _secretResolver.FindKey(didDoc.Authentications.FirstOrDefault());
             if (secret is null)
@@ -50,18 +51,22 @@ public class SenderKeySelector
         }
     }
 
-    public async Task<(Key, List<Key>)> FindAuthCryptKeys(string from, string to)
+    public async Task<Result<(Key, List<Key>)>> FindAuthCryptKeys(string from, string to)
     {
         var didFrom = DidUtils.DivideDidFragment(from);
         var didTo = DidUtils.DivideDidFragment(to);
-        var didDocTo = await _didDocResolver.Resolve(didTo.First()) ?? throw new DidDocNotResolvedException(didTo.First());
+        var didDocTo = await _didDocResolver.Resolve(didTo.First());
+        if (didDocTo is null)
+        {
+            return Result.Fail($"DID '{didTo.First()}' could not be resolved");
+        }
 
         if (DidUtils.IsDidFragment(from))
         {
-            Secret? secret = await _secretResolver.FindKey(from);
+            var secret = await _secretResolver.FindKey(from);
             if (secret is null)
             {
-                throw new SecretNotFoundException(from);
+                return Result.Fail($"Unable to find secret of '{from}'");
             }
 
             var sender = Key.FromSecret(secret);
@@ -71,10 +76,10 @@ public class SenderKeySelector
                 throw new IncompatibleCryptoException($"The recipient '{to}' curve is not compatible to '{sender.Curve.Name}'");
             }
 
-            return (
+            return Result.Ok((
                 sender: sender,
                 recipients: recipients
-            );
+            ));
         }
         else
         {

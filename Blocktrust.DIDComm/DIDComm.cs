@@ -89,8 +89,9 @@ public class DidComm
         {
             return packFromPriorResult.ToResult();
         }
+
         var (message, fromPriorIssuerKid) = packFromPriorResult.Value;
-        
+
         var signFromKey = await senderKeySelector.FindSigningKey(param.SignFrom);
         if (signFromKey.IsFailed)
         {
@@ -165,7 +166,7 @@ public class DidComm
         {
             return packFromPriorResult.ToResult();
         }
-        
+
         var (message, fromPriorIssuerKid) = packFromPriorResult.Value;
         var signResult = await Operations.PackEncrypt.SignIfNeeded(message.ToString(), param, senderKeySelector);
         if (signResult.IsFailed)
@@ -174,7 +175,12 @@ public class DidComm
         }
 
         var (payload, signFromKid) = signResult.Value;
-        var (encryptedResult, recipientKeys) = await PackEncrypt.Encrypt(param, payload, senderKeySelector);
+        var packEncryptResult = await PackEncrypt.Encrypt(param, payload, senderKeySelector);
+        if (packEncryptResult.IsFailed)
+        {
+            return packEncryptResult.ToResult();
+        }
+        var (encryptedResult, recipientKeys) = packEncryptResult.Value;
         var encryptResult = PackEncrypt.ProtectSenderIfNeeded(param, encryptedResult, recipientKeys);
 
         // TODO make that (along with service metadata) as

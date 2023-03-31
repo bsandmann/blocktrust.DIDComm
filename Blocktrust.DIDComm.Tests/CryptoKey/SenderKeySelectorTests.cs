@@ -61,7 +61,8 @@ public class SenderKeySelectorTests
     public async Task Test_find_auth_crypto_keys_by_DID()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        (Key from, List<Key> to) = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, JWMFixture.BOB_DID);
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, JWMFixture.BOB_DID);
+        (Key from, List<Key> to) = findAuthCryptKeysResult.Value;
 
         var expected = (
             "did:example:alice#key-x25519-1",
@@ -74,14 +75,15 @@ public class SenderKeySelectorTests
         );
 
         Assert.Equal(expected.Item1, from.Id);
-        Assert.Equivalent(expected.Item2, to.Select(p=>p.Id));
+        Assert.Equivalent(expected.Item2, to.Select(p => p.Id));
     }
 
     [Fact]
     public async Task Test_find_auth_crypto_keys_by_Alice_DID_URL()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        (Key from, List<Key> to)  = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-x25519-1", JWMFixture.BOB_DID);
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-x25519-1", JWMFixture.BOB_DID);
+        (Key from, List<Key> to) = findAuthCryptKeysResult.Value;
 
         var expected = (
             "did:example:alice#key-x25519-1",
@@ -94,14 +96,15 @@ public class SenderKeySelectorTests
         );
 
         Assert.Equal(expected.Item1, from.Id);
-        Assert.Equivalent(expected.Item2, to.Select(p=>p.Id));
+        Assert.Equivalent(expected.Item2, to.Select(p => p.Id));
     }
 
     [Fact]
     public async Task Test_find_auth_crypto_keys_by_Bob_DID_URL()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        (Key from, List<Key> to)  = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, "did:example:bob#key-x25519-3");
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, "did:example:bob#key-x25519-3");
+        (Key from, List<Key> to) = findAuthCryptKeysResult.Value;
 
         var expected = (
             "did:example:alice#key-x25519-1",
@@ -119,7 +122,8 @@ public class SenderKeySelectorTests
     public async Task Test_find_auth_crypto_keys_by_DID_URL()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        (Key from, List<Key> to) = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-x25519-1", "did:example:bob#key-x25519-3");
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-x25519-1", "did:example:bob#key-x25519-3");
+        (Key from, List<Key> to) = findAuthCryptKeysResult.Value;
 
         var expected = (
             "did:example:alice#key-x25519-1",
@@ -144,11 +148,13 @@ public class SenderKeySelectorTests
             "did:example:bob#key-p256-2"
         };
 
-        var sender = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, "did:example:bob#key-p256-2");
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, "did:example:bob#key-p256-2");
+        (Key from, List<Key> to) = findAuthCryptKeysResult.Value;
         //TODO compare: I dont kknow if the id is correct
-        Assert.Equal(expectedSenderKey, sender.Item1.Id);
+        Assert.Equal(expectedSenderKey, from.Id);
 
-        var (_, recipients) = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-p256-1", JWMFixture.BOB_DID);
+        var findAuthCryptKeysResult2 = await senderKeySelector.FindAuthCryptKeys("did:example:alice#key-p256-1", JWMFixture.BOB_DID);
+        var (_, recipients) = findAuthCryptKeysResult2.Value;
         Assert.Equivalent(expectedRecipientKeys, recipients.Select(it => it.Id));
     }
 
@@ -165,16 +171,19 @@ public class SenderKeySelectorTests
     public async Task Test_key_not_found_by_DID_URL()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        var expected = "The Secret 'did:example:alice#key-x25519-3' not found";
         var didUrl = "did:example:alice#key-x25519-3";
 
-        var findSigningKeyResult =  await senderKeySelector.FindSigningKey(didUrl);
+        var findSigningKeyResult = await senderKeySelector.FindSigningKey(didUrl);
         findSigningKeyResult.IsSuccess.Should().BeFalse();
         findSigningKeyResult.Errors.First().Message.Should().Be("Unable to find secret for signing of 'did:example:alice#key-x25519-3'");
-        var exception2 = await Assert.ThrowsAsync<SecretNotFoundException>(async () => await senderKeySelector.FindAuthCryptKeys(didUrl, "did:example:bob#key-x25519-1"));
-        Assert.Equal(expected, exception2.Message);
-        var exception3 = await Assert.ThrowsAsync<SecretNotFoundException>(async () => await senderKeySelector.FindAuthCryptKeys(didUrl, JWMFixture.BOB_DID));
-        Assert.Equal(expected, exception3.Message);
+        
+        var findAuthCryptKeysResult = await senderKeySelector.FindAuthCryptKeys(didUrl, "did:example:bob#key-x25519-1");
+        findAuthCryptKeysResult.IsSuccess.Should().BeFalse();
+        findAuthCryptKeysResult.Errors.First().Message.Should().Be("Unable to find secret of 'did:example:alice#key-x25519-3'");
+        
+        var findAuthCryptKeysResult2 =  await senderKeySelector.FindAuthCryptKeys(didUrl, JWMFixture.BOB_DID);
+        findAuthCryptKeysResult2.IsSuccess.Should().BeFalse();
+        findAuthCryptKeysResult2.Errors.First().Message.Should().Be("Unable to find secret of 'did:example:alice#key-x25519-3'");
     }
 
     [Fact]
@@ -200,11 +209,14 @@ public class SenderKeySelectorTests
         var findSigningKeyResult = await senderKeySelector.FindSigningKey(did);
         findSigningKeyResult.IsSuccess.Should().BeFalse();
         findSigningKeyResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
-        
+
         var exception2 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAnonCryptKeys(did));
         Assert.Equal(expected, exception2.Message);
-        var exception3 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, did));
-        Assert.Equal(expected, exception3.Message);
+        
+        var findAuthCryptKeysResult= await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, did);
+        findAuthCryptKeysResult.IsSuccess.Should().BeFalse();
+        findAuthCryptKeysResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
+        
         var exception4 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAuthCryptKeys(did, JWMFixture.ALICE_DID));
         Assert.Equal(expected, exception4.Message);
     }
@@ -215,7 +227,7 @@ public class SenderKeySelectorTests
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
         var exception1 = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindSigningKey(JWMFixture.ELLIE_DID));
         Assert.Equal("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'authentication' verification methods", exception1.Message);
-        
+
         var exception2 = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID));
         Assert.Equal("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods", exception2.Message);
 

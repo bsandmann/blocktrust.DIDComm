@@ -21,6 +21,7 @@ public class PackEncrypt
             {
                 return keyResult.ToResult();
             }
+
             return (Jws.Sign(message, keyResult.Value), keyResult.Value.Id);
         }
         else
@@ -29,11 +30,17 @@ public class PackEncrypt
         }
     }
 
-    public static async Task<(EncryptResult, List<Key>)> Encrypt(PackEncryptedParams param, string payload, SenderKeySelector keySelector)
+    public static async Task<Result<(EncryptResult, List<Key>)>> Encrypt(PackEncryptedParams param, string payload, SenderKeySelector keySelector)
     {
         if (param.From != null)
         {
-            (var senderKey, var recipientKeys) = await keySelector.FindAuthCryptKeys(param.From, param.To);
+            var findAuthCryptKeysResult = await keySelector.FindAuthCryptKeys(param.From, param.To);
+            if (findAuthCryptKeysResult.IsFailed)
+            {
+                return findAuthCryptKeysResult.ToResult();
+            }
+
+            var (senderKey, recipientKeys) = findAuthCryptKeysResult.Value;
             return (JweExtensions.AuthEncrypt(payload, param.EncAlgAuth, senderKey, recipientKeys), recipientKeys);
         }
         else

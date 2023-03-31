@@ -194,7 +194,7 @@ public class Routing
 
             encryptedResult = (await PackEncrypt.Encrypt(
                 packParamsBuilder.BuildPackEncryptedParams(), fwdMsg.Message.ToString(), keySelector
-            )).Item1;
+            )).Value.Item1;
 
             //TODO?? correct?
             forwardedMsg = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(encryptedResult.PackedMessage);
