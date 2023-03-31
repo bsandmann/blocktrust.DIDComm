@@ -34,7 +34,7 @@ public class DidComm
 
         var (message, fromPriorIssuerKid) = await FromPrior.PackFromPrior(param.Message, param.FromPriorIssuerKid, senderKeySelector);
 
-        return new PackPlaintextResult(message.ToString(), fromPriorIssuerKid);
+        return Result.Ok(new PackPlaintextResult(message.ToString(), fromPriorIssuerKid));
     }
 
     public async Task<Result<PackSignedResult>> PackSigned(PackSignedParams param)
@@ -47,7 +47,7 @@ public class DidComm
         var signFromKey = await senderKeySelector.FindSigningKey(param.SignFrom);
         var msg = Jws.Sign(message.ToString(), signFromKey);
 
-        return new PackSignedResult(msg, signFromKey.Id, fromPriorIssuerKid);
+        return Result.Ok(new PackSignedResult(msg, signFromKey.Id, fromPriorIssuerKid));
     }
 
 
