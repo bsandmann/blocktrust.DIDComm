@@ -35,9 +35,9 @@ public class PackSignedTests
         PackSignedResult packResult;
         try
         {
-            packResult = await didComm.PackSigned(
+            packResult = (await didComm.PackSigned(
                 new PackSignedParamsBuilder(message: data.Msg, signFrom: data.SignedFrom).BuildPackSginedParams()
-            );
+            )).Value;
         }
         catch (UnsupportedAlgorithmException e)
         {

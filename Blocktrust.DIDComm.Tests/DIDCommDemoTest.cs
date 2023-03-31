@@ -193,7 +193,7 @@ public class DIDCommDemoTest
         );
 
         var unpackResult =await  didComm.Unpack(
-            new UnpackParamsBuilder(packResult.PackedMessage).BuildUnpackParams()
+            new UnpackParamsBuilder(packResult.Value.PackedMessage).BuildUnpackParams()
         );
         
         message.Should().BeEquivalentTo(unpackResult.Value.Message, options => options.Excluding(x => x.Body));

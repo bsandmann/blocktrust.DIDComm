@@ -23,13 +23,13 @@ public class SignedMessageTests
             );
     
             var unpacked = await didComm.Unpack(
-                new UnpackParamsBuilder(packed.PackedMessage).BuildUnpackParams()
+                new UnpackParamsBuilder(packed.Value.PackedMessage).BuildUnpackParams()
             );
     
             //TODO unclear if correctly converted
             var expectedDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(test.expected);
             var expected = JwsObject.Parse(expectedDictionary);
-            var signedDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(packed.PackedMessage);
+            var signedDictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(packed.Value.PackedMessage);
             var signed = JwsObject.Parse(signedDictionary);
             
             //TODO reactivate this test

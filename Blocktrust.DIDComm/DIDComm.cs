@@ -37,7 +37,7 @@ public class DidComm
         return new PackPlaintextResult(message.ToString(), fromPriorIssuerKid);
     }
 
-    public async Task<PackSignedResult> PackSigned(PackSignedParams param)
+    public async Task<Result<PackSignedResult>> PackSigned(PackSignedParams param)
     {
         var didDocResolver = param.IdidDocResolver ?? this._didDocResolver;
         var secretResolver = param.SecretResolver ?? this._secretResolver;
