@@ -6,6 +6,7 @@ using Blocktrust.Common.Converter;
 using Common.Algorithms;
 using Common.Types;
 using Exceptions;
+using FluentResults;
 using JWM;
 using JWS;
 using Keys;
@@ -304,7 +305,7 @@ public class JweExtensions
     }
 
     // //TODO moved here. unclear if references are correct 
-    public static async Task<(Message, Metadata)> Unpack(
+    public static async Task<(Result<Message>, Metadata)> Unpack(
         JweParseResult jweParseResult,
         RecipientKeySelector keySelector,
         bool expectDecryptByAllKeys,
@@ -316,7 +317,7 @@ public class JweExtensions
         switch (alg)
         {
             case AuthCryptAlg:
-                var f = await JweExtensions.AuthUnpack(
+                var authUnpackResult = await JweExtensions.AuthUnpack(
                     jweParseResult,
                     keySelector,
                     (AuthCryptAlg)alg,
@@ -324,9 +325,9 @@ public class JweExtensions
                     metadataUnpackResultBuilder
                 );
                 //TODO?
-                return (f, null);
+                return ((authUnpackResult, null));
             case AnonCryptAlg:
-                var f2 = await JweExtensions.AnonUnpack(
+                var AnonUnpackResult = await JweExtensions.AnonUnpack(
                     jweParseResult,
                     keySelector,
                     (AnonCryptAlg)alg,
@@ -334,8 +335,7 @@ public class JweExtensions
                     metadataUnpackResultBuilder,
                     unwrapReWrappingForward
                 );
-                //
-                return (f2, null);
+                return (AnonUnpackResult, null);
                 break;
         }
 
@@ -400,7 +400,7 @@ public class JweExtensions
         };
     }
 
-    private static async Task<Message> AnonUnpack(
+    private static async Task<Result<Message>> AnonUnpack(
         JweParseResult jweParseResult,
         RecipientKeySelector keySelector,
         AnonCryptAlg anonCryptAlg,
@@ -466,7 +466,7 @@ public class JweExtensions
                 if (await keySelector.HasKeysForForwardNext(forwardMsg.ForwardNext))
                 {
                     metadataUnpackResultBuilder.ReWrappedInForward(true);
-                    var unpacked = await Unpacker.Unpack(
+                    var unpackedResult = await Unpacker.Unpack(
                         forwardMsg.ForwardedMsg,
                         keySelector,
                         metadataUnpackResultBuilder,
@@ -474,7 +474,7 @@ public class JweExtensions
                         unwrapReWrappingForward
                     );
 
-                    return unpacked;
+                    return unpackedResult;
                 }
             }
         }

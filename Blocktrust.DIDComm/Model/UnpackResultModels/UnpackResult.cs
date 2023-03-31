@@ -4,8 +4,8 @@ using Message.Messages;
 
 public class UnpackResult
 {
-    public Message Message;
-    public Metadata Metadata;
+    public readonly Message Message;
+    public readonly Metadata Metadata;
 
     public UnpackResult(Message message, Metadata metadata)
     {

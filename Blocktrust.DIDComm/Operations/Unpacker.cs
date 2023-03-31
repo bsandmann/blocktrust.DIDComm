@@ -18,14 +18,18 @@ public class Unpacker
         {
             var packedMessage = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(param.PackedMessage);
             var metadataBuilder = new UnpackResultBuilder();
-            var msg = await Unpack(
+            var msgResult = await Unpack(
                 packedMessage,
                 keySelector,
                 metadataBuilder,
                 param.ExpectDecryptByAllKeys,
                 param.UnwrapReWrappingForward
             );
-            return Result.Ok(new UnpackResult(msg, metadataBuilder.BuildUnpackResult()));
+            if (msgResult.IsFailed)
+            {
+                return msgResult.ToResult();
+            }
+            return Result.Ok(new UnpackResult(msgResult.Value, metadataBuilder.BuildUnpackResult()));
         }
         catch (Exception e)
         {
@@ -33,7 +37,7 @@ public class Unpacker
         }
     }
 
-    public static async Task<Message> Unpack(
+    public static async Task<Result<Message>> Unpack(
         Dictionary<string, object?> packedMessage,
         RecipientKeySelector keySelector,
         UnpackResultBuilder metadataUnpackResultBuilder,
@@ -54,6 +58,6 @@ public class Unpacker
             return await JwmExtensions.Unpack((JwmParseResult)parseResult, keySelector, metadataUnpackResultBuilder);
         }
 
-        throw new Exception("Unable to unpack message");
+        return Result.Fail("Unable to unpack message");
     }
 }
