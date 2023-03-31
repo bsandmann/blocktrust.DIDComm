@@ -15,7 +15,7 @@ public class SenderKeySelectorTests
     public async Task Test_find_anon_crypto_keys_by_DID()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        var keys = await senderKeySelector.FindAnonCryptKeys(JWMFixture.BOB_DID);
+        var keysResult = await senderKeySelector.FindAnonCryptKeys(JWMFixture.BOB_DID);
 
         var expected = new List<string>
         {
@@ -24,17 +24,17 @@ public class SenderKeySelectorTests
             "did:example:bob#key-x25519-3"
         };
 
-        Assert.Equivalent(expected, keys.Select(it => it.Id));
+        Assert.Equivalent(expected, keysResult.Value.Select(it => it.Id));
     }
 
     [Fact]
     public async Task Test_find_anon_crypto_keys_by_DID_URL()
     {
         var senderKeySelector = new SenderKeySelector(new DidDocResolverMock(), new AliceSecretResolverMock());
-        var keys = await senderKeySelector.FindAnonCryptKeys("did:example:bob#key-x25519-2");
+        var keysResult = await senderKeySelector.FindAnonCryptKeys("did:example:bob#key-x25519-2");
 
         var expected = new List<string> { "did:example:bob#key-x25519-2" };
-        Assert.Equivalent(expected, keys.Select(it => it.Id));
+        Assert.Equivalent(expected, keysResult.Value.Select(it => it.Id));
     }
 
     [Fact]
@@ -211,8 +211,9 @@ public class SenderKeySelectorTests
         findSigningKeyResult.IsSuccess.Should().BeFalse();
         findSigningKeyResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
 
-        var exception2 = await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await senderKeySelector.FindAnonCryptKeys(did));
-        Assert.Equal(expected, exception2.Message);
+        var findAnonCryptKeysResult = await senderKeySelector.FindAnonCryptKeys(did);
+        findAnonCryptKeysResult.IsSuccess.Should().BeFalse();
+        findAnonCryptKeysResult.Errors.First().Message.Should().Be("DID 'did:example:nona' could not be resolved");
         
         var findAuthCryptKeysResult= await senderKeySelector.FindAuthCryptKeys(JWMFixture.ALICE_DID, did);
         findAuthCryptKeysResult.IsSuccess.Should().BeFalse();
@@ -231,12 +232,10 @@ public class SenderKeySelectorTests
         result1.IsFailed.Should().BeTrue();
         result1.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'authentication' verification methods");
 
-        var exception2 = await Assert.ThrowsAsync<DidDocException>(async () => await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID));
-        Assert.Equal("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods", exception2.Message);
-        // var result2 =  await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID);
-        // result2.IsFailed.Should().BeTrue();
-        // result2.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods");
-        //
+        var result2 =  await senderKeySelector.FindAnonCryptKeys(JWMFixture.ELLIE_DID);
+        result2.IsFailed.Should().BeTrue();
+        result2.Errors.First().Message.Should().Be("The DID Doc '" + JWMFixture.ELLIE_DID + "' does not contain compatible 'keyAgreement' verification methods");
+        
         var result3 = await senderKeySelector.FindAuthCryptKeys(JWMFixture.ELLIE_DID, JWMFixture.BOB_DID);
         result3.IsFailed.Should().BeTrue();
         result3.Errors.First().Message.Should().Be("The DID Docs '" + JWMFixture.ELLIE_DID + "' and '" + JWMFixture.BOB_DID + "' do not contain compatible 'keyAgreement' verification methods");
@@ -266,7 +265,9 @@ public class SenderKeySelectorTests
     public async Task Test_find_anoncrypt_pack_recipient_public_keys_by_did_unknown_did()
     {
         var keySelector = new SenderKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await keySelector.FindAnonCryptKeys("did:example:unknown"));
+        var result = await keySelector.FindAnonCryptKeys("did:example:unknown");
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("DID 'did:example:unknown' could not be resolved");
     }
 
     [Fact]
@@ -274,7 +275,9 @@ public class SenderKeySelectorTests
     {
         var keySelector = new SenderKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
 
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await keySelector.FindAnonCryptKeys("did:example:unknown#key-1"));
+        var result =await keySelector.FindAnonCryptKeys("did:example:unknown#key-1");
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("DID 'did:example:unknown' could not be resolved");
     }
 
     [Fact]
@@ -282,7 +285,9 @@ public class SenderKeySelectorTests
     {
         var keySelector = new SenderKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
 
-        await Assert.ThrowsAsync<DidDocNotResolvedException>(async () => await keySelector.FindAnonCryptKeys(JWMFixture.BOB_DID + "unknown#key-1"));
+        var result =await keySelector.FindAnonCryptKeys(JWMFixture.BOB_DID + "unknown#key-1");
+        result.IsFailed.Should().BeTrue();
+        result.Errors.First().Message.Should().Be("DID 'did:example:bobunknown' could not be resolved");
     }
 
     [Fact]
@@ -291,7 +296,7 @@ public class SenderKeySelectorTests
         var keySelector = new SenderKeySelector(new DidDocResolverMockWithNoSecrets(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
         DIDDocBob.DID_DOC_BOB_WITH_NO_SECRETS.VerificationMethods.ToList().ForEach(async vm =>
         {
-            var res = (await keySelector.FindAnonCryptKeys(vm.Id)).Select(it => it.Jwk).ToList();
+            var res = (await keySelector.FindAnonCryptKeys(vm.Id)).Value.Select(it => it.Jwk).ToList();
             var listOfVM = new List<Jwk> { Key.FromVerificationMethod(vm).Jwk };
             Assert.Equivalent(listOfVM, res);
         });
@@ -304,7 +309,7 @@ public class SenderKeySelectorTests
 
         var expected = TestUtils.GetKeyAgreementMethods(TestUtils.Person.BOB, TestUtils.KeyAgreementCurveType.X25519)
             .Select(it => Key.FromVerificationMethod(it).Jwk).ToList();
-        var res = (await keySelector.FindAnonCryptKeys(JWMFixture.BOB_DID)).Select(it => it.Jwk).ToList();
+        var res = (await keySelector.FindAnonCryptKeys(JWMFixture.BOB_DID)).Value.Select(it => it.Jwk).ToList();
 
         Assert.Equivalent(expected, res);
     }

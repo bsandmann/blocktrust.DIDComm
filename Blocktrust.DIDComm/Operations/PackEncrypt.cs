@@ -10,7 +10,7 @@ using Model.PackEncryptedParamsModels;
 using ProtocolsRouting.Routing;
 using Utils;
 
-public class PackEncrypt
+public static class PackEncrypt
 {
     public static async Task<Result<(string, string?)>> SignIfNeeded(string message, PackEncryptedParams param, SenderKeySelector keySelector)
     {
@@ -45,8 +45,12 @@ public class PackEncrypt
         }
         else
         {
-            var recipientKeys = await keySelector.FindAnonCryptKeys(param.To);
-            return (JweExtensions.AnonEncrypt(payload, param.EncAlgAnon, recipientKeys), recipientKeys);
+            var recipientKeysResult = await keySelector.FindAnonCryptKeys(param.To);
+            if (recipientKeysResult.IsFailed)
+            {
+                return recipientKeysResult.ToResult();
+            }
+            return (JweExtensions.AnonEncrypt(payload, param.EncAlgAnon, recipientKeysResult.Value), recipientKeysResult.Value);
         }
     }
 
@@ -66,7 +70,7 @@ public class PackEncrypt
         string packedMessage,
         PackEncryptedParams param,
         List<Service> didServicesChain,
-        IDidDocResolver ididDocResolver,
+        IDidDocResolver didDocResolver,
         ISecretResolver secretResolver)
     {
         if (!(param.Forward && didServicesChain.Count > 0))
@@ -86,7 +90,7 @@ public class PackEncrypt
             routingKeys.AddRange(didServicesChain.Skip(1).Select(it => it.ServiceEndpoint).ToList());
         }
 
-        var r = new Routing(ididDocResolver, secretResolver);
+        var r = new Routing(didDocResolver, secretResolver);
         return await r.WrapInForward(
             JsonUtils.FromJsonToMap(packedMessage),
             param.To,

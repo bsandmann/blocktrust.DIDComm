@@ -118,10 +118,14 @@ public class SenderKeySelector
         }
     }
 
-    public async Task<List<Key>> FindAnonCryptKeys(string to)
+    public async Task<Result<List<Key>>> FindAnonCryptKeys(string to)
     {
         var did = DidUtils.DivideDidFragment(to);
-        var didDoc = await _didDocResolver.Resolve(did.First()) ?? throw new DidDocNotResolvedException(did.First());
+        var didDoc = await _didDocResolver.Resolve(did.First());
+        if (didDoc is null)
+        {
+            return Result.Fail($"DID '{did.First()}' could not be resolved");
+        }
 
         return DidUtils.IsDidFragment(to)
             ? new List<Key> { Key.FromVerificationMethod(didDoc.FindVerificationMethod(to)) }
@@ -135,7 +139,7 @@ public class SenderKeySelector
                     .Select(Key.FromVerificationMethod)
                     .Where(key => selectedCurve == key.Curve)
                     .ToList()
-                : throw new DidDocException($"The DID Doc '{didDoc.Did}' does not contain compatible 'keyAgreement' verification methods");
+                : Result.Fail($"The DID Doc '{didDoc.Did}' does not contain compatible 'keyAgreement' verification methods");
     }
 
     private List<Key> FindRecipientKeys(DidDoc didDoc, string to, Curve curve)
