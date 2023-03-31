@@ -9,21 +9,21 @@ using Exceptions;
 using Message.Messages;
 using Utils;
 
-public class FromPrior
+public static class FromPrior
 {
-    public static async Task<(Message, string)> PackFromPrior(
+    public static async Task<(Message, string?)> PackFromPrior(
         Message message,
-        string fromPriorIssuerKid,
+        string? fromPriorIssuerKid,
         SenderKeySelector keySelector)
     {
-        //Make a deep copy of the message
+        // Make a deep copy of the message
         var messageCopy =  message.Copy();
         
-        if (messageCopy.FromPrior != null)
+        if (messageCopy.FromPrior is not null)
         {
             var key = await keySelector.FindSigningKey(fromPriorIssuerKid ?? messageCopy.FromPrior.Iss);
 
-            messageCopy.FromPriorJwt = Jwt.SignJwt(messageCopy.FromPrior.ToJsonObject(), key);
+            messageCopy.FromPriorJwt = Jwt.SignJwt(messageCopy.FromPrior!.ToJsonObject(), key);
             messageCopy.FromPrior = null;
 
             return (messageCopy, key.Id);
@@ -34,17 +34,16 @@ public class FromPrior
         }
     }
 
-    public static async Task<(Message, string)> UnpackFromPrior(Message message, RecipientKeySelector keySelector)
+    public static async Task<(Message, string?)> UnpackFromPrior(Message message, RecipientKeySelector keySelector)
     {
-        //Make a deep copy of the message
+        // Make a deep copy of the message
         var messageCopy = message.Copy();
         
-        if (messageCopy.FromPriorJwt != null)
+        if (messageCopy.FromPriorJwt is not null)
         {
-            string issKid = ExtractFromPriorKid(messageCopy.FromPriorJwt);
+            var issKid = ExtractFromPriorKid(messageCopy.FromPriorJwt);
             var key = await keySelector.FindVerificationKey(issKid);
             var verified = Jwt.VerifyJwt(messageCopy.FromPriorJwt, key);
-            //TODO Inbetween here in the kotlin code this is transformed to a claimsobject with some logic i dont get
             messageCopy.FromPrior = (DIDComm.Message.FromPriors.FromPrior.Parse(verified));
             messageCopy.FromPriorJwt = null;
             return (messageCopy, key.Id);
