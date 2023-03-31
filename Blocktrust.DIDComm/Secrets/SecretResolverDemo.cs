@@ -3,9 +3,10 @@
 using System.Text.Json;
 using Blocktrust.Common.Converter;
 using Blocktrust.Common.Models.Secrets;
+using Blocktrust.Common.Resolver;
 using Crypto.JWE;
 
-public class SecretResolverDemo : SecretResolverEditable
+public class SecretResolverDemo : ISecretResolver
 {
     private readonly string _filePath;
     private readonly Dictionary<string, Secret> _secrets;
@@ -47,9 +48,9 @@ public class SecretResolverDemo : SecretResolverEditable
         File.WriteAllText(_filePath, secretJson);
     }
 
-    public void AddKey(Secret secret)
+    public async Task AddKey(string kid,Secret secret)
     {
-        _secrets[secret.Kid] = secret;
+        _secrets[kid] = secret;
         Save();
     }
 
@@ -58,12 +59,12 @@ public class SecretResolverDemo : SecretResolverEditable
         return _secrets.Keys;
     }
 
-    public Secret? FindKey(string kid)
+    public async Task<Secret?> FindKey(string kid)
     {
         return _secrets.ContainsKey(kid) ? _secrets[kid] : null;
     }
 
-    public ISet<string> FindKeys(IEnumerable<string> kids)
+    public async Task<HashSet<string>> FindKeys(List<string> kids)
     {
         return new HashSet<string>(kids.Intersect(_secrets.Keys));
     }

@@ -13,6 +13,7 @@ public static class JwmExtensions
     {
         metadataUnpackResultBuilder.FromPriorJwt(result.Message.FromPriorJwt);
         (Message updatedMessage, string fromPriorIssuerKid) = await Operations.FromPrior.UnpackFromPrior(result.Message, keySelector);
+        var unpackFromPriorResult = await Operations.FromPrior.UnpackFromPrior(result.Message, keySelector);
          metadataUnpackResultBuilder.FromPriorIssuerKid(fromPriorIssuerKid);
         return updatedMessage;
     } 

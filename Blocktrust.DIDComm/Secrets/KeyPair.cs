@@ -2,8 +2,8 @@
 
 public class KeyPair
 {
-    public Dictionary<string, object> PrivateKey;
-    public Dictionary<string, object> PublicKey;
+    public readonly Dictionary<string, object> PrivateKey;
+    public readonly Dictionary<string, object> PublicKey;
 
     public KeyPair(Dictionary<string, object> privateKey, Dictionary<string, object> publicKey)
     {
