@@ -3,6 +3,7 @@
     using System.Text;
     using System.Text.Json;
     using Blocktrust.Common.Converter;
+    using Utils;
 
     //TODO is a jwepayload different from a jws payload?
 

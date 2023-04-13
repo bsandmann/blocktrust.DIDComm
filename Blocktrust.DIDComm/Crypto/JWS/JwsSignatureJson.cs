@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Blocktrust.Common.Converter;
+using Utils;
 
 public class JwsSignatureJson
 {

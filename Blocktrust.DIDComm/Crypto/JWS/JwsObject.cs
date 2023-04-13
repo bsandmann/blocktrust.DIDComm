@@ -6,6 +6,7 @@ using Blocktrust.Common.Converter;
 using JWE;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
+using Utils;
 
 public class JwsObject
 {

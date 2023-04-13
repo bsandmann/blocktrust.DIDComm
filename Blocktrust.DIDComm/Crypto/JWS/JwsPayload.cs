@@ -3,6 +3,7 @@
 using System.Text;
 using System.Text.Json;
 using Blocktrust.Common.Converter;
+using Utils;
 
 public class JwsPayload
 {

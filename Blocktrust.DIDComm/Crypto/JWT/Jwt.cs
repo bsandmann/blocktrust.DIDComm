@@ -6,6 +6,7 @@ using Blocktrust.Common.Converter;
 using Exceptions;
 using JWS;
 using Keys;
+using Utils;
 
 public static class Jwt
 {

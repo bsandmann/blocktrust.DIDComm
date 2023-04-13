@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using Blocktrust.Common.Converter;
 using Keys;
+using Utils;
 
 public class JwsHeader
 {

@@ -6,6 +6,7 @@ using Blocktrust.Common.Converter;
 using JWS;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
+using Utils;
 
 //TODO this is a naive custom implemenation of the JWEObjectJson found in the Kotlin-Library
 

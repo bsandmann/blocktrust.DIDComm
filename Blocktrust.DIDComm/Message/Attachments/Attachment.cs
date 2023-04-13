@@ -8,14 +8,14 @@ using Utils;
 
 public class Attachment
 {
-    [JsonPropertyName("id")] public string Id { get; private set; }
-    [JsonPropertyName("data")] public IData Data { get; private set; }
-    [JsonPropertyName("description")] public string? Description { get; private set; }
-    [JsonPropertyName("filename")] public string? Filename { get; private set; }
-    [JsonPropertyName("media_type")] public string? MediaType { get; private set; }
-    [JsonPropertyName("format")] public string? Format { get; private set; }
-    [JsonPropertyName("lastmod_time")] public long? LastModTime { get; private set; }
-    [JsonPropertyName("byte_count")] public long? ByteCount { get; private set; }
+    [JsonPropertyName("id")] public string Id { get; set; }
+    [JsonPropertyName("data")] public IData Data { get; set; }
+    [JsonPropertyName("description")] public string? Description { get; set; }
+    [JsonPropertyName("filename")] public string? Filename { get; set; }
+    [JsonPropertyName("media_type")] public string? MediaType { get; set; }
+    [JsonPropertyName("format")] public string? Format { get; set; }
+    [JsonPropertyName("lastmod_time")] public long? LastModTime { get; set; }
+    [JsonPropertyName("byte_count")] public long? ByteCount { get; set; }
 
     [JsonConstructor]
     public Attachment()

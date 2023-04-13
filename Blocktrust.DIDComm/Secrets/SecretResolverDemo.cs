@@ -5,6 +5,7 @@ using Blocktrust.Common.Converter;
 using Blocktrust.Common.Models.Secrets;
 using Blocktrust.Common.Resolver;
 using Crypto.JWE;
+using Utils;
 
 public class SecretResolverDemo : ISecretResolver
 {
