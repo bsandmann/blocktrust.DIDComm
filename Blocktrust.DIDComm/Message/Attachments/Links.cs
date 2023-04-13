@@ -1,15 +1,21 @@
 ﻿namespace Blocktrust.DIDComm.Message.Attachments;
 
+using System.Text.Json.Serialization;
 using Exceptions;
 using Utils;
 
 public class Links : IData
 {
-    public List<string> LinksString { get; set; }
-    public string? Hash { get; set; }
-    public Dictionary<string, object>? Jws { get; set; }
+    [JsonPropertyName("links")] public List<string> LinksString { get; set; }
+    [JsonPropertyName("hash")] public string? Hash { get; set; }
+    [JsonPropertyName("jws")] public Dictionary<string, object>? Jws { get; set; }
 
-    public Links(List<string> linksString, string? hash = null, Dictionary<string,object>? jws = null)
+    [JsonConstructor]
+    public Links()
+    {
+    }
+
+    public Links(List<string> linksString, string? hash = null, Dictionary<string, object>? jws = null)
     {
         this.LinksString = linksString;
         this.Hash = hash;

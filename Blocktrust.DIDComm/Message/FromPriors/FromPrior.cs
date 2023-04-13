@@ -16,6 +16,7 @@ public class FromPrior
     [JsonPropertyName("iat")] public long? Iat { get; set; }
     [JsonPropertyName("jti")] public string? Jti { get; set; }
 
+    [JsonConstructor]
     public FromPrior()
     {
         // Need for deserialization

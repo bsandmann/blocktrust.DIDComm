@@ -2,19 +2,25 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Exceptions;
 using Utils;
 
 public class Attachment
 {
-    public string Id { get; private set; }
-    public IData Data { get; private set; }
-    public string? Description { get; private set; }
-    public string? Filename { get; private set; }
-    public string? MediaType { get; private set; }
-    public string? Format { get; private set; }
-    public long? LastModTime { get; private set; }
-    public long? ByteCount { get; private set; }
+    [JsonPropertyName("id")] public string Id { get; private set; }
+    [JsonPropertyName("data")] public IData Data { get; private set; }
+    [JsonPropertyName("description")] public string? Description { get; private set; }
+    [JsonPropertyName("filename")] public string? Filename { get; private set; }
+    [JsonPropertyName("media_type")] public string? MediaType { get; private set; }
+    [JsonPropertyName("format")] public string? Format { get; private set; }
+    [JsonPropertyName("lastmod_time")] public long? LastModTime { get; private set; }
+    [JsonPropertyName("byte_count")] public long? ByteCount { get; private set; }
+
+    [JsonConstructor]
+    public Attachment()
+    {
+    }
 
     public Attachment(AttachmentBuilder attachmentBuilder)
     {
@@ -55,6 +61,7 @@ public class Attachment
         {
             throw new MalformedMessageException($"The header \"data\" is missing");
         }
+
         var data = IData.Parse(dataObject);
 
         var builder = new AttachmentBuilder(id, data);
@@ -91,7 +98,7 @@ public class Attachment
 
         return builder.Build();
     }
-    
+
     public Dictionary<string, object> ToJSONObject()
     {
         var result = new Dictionary<string, object>()
@@ -118,6 +125,7 @@ public class Attachment
         {
             result.Remove(key);
         }
+
         return result;
     }
 

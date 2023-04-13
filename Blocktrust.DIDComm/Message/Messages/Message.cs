@@ -11,24 +11,30 @@ using Utils;
 
 public class Message
 {
-    [JsonPropertyName("id")] public string Id { get; }
-    [JsonPropertyName("body")] public Dictionary<string, object?> Body { get; }
-    [JsonPropertyName("type")] public string Type { get; }
-    [JsonPropertyName("typ")] public string Typ { get; }
+    [JsonPropertyName("id")] public string Id { get; set; }
+    [JsonPropertyName("body")] public Dictionary<string, object?> Body { get; set; }
+    [JsonPropertyName("type")] public string Type { get; set; }
+    [JsonPropertyName("typ")] public string Typ { get; set; }
     [JsonPropertyName("from")] public string? From { get; set; }
     [JsonPropertyName("to")] public IList<string>? To { get; set; }
-    [JsonPropertyName("created_time")] public long? CreatedTime { get; }
-    [JsonPropertyName("expires_time")] public long? ExpiresTime { get; }
+    [JsonPropertyName("created_time")] public long? CreatedTime { get; set; }
+    [JsonPropertyName("expires_time")] public long? ExpiresTime { get; set; }
     [JsonPropertyName("from_prior")] public FromPrior? FromPrior { get; set; }
     [JsonPropertyName("fromPriorJwt")] public string? FromPriorJwt { get; set; }
-    [JsonPropertyName("attachments")] public IList<Attachment>? Attachments { get; }
-    [JsonPropertyName("please_ack")] public bool? PleaseAck { get; }
-    [JsonPropertyName("ack")] public string? Ack { get; }
-    [JsonPropertyName("thid")] public string? Thid { get; }
-    [JsonPropertyName("pthid")] public string? Pthid { get; }
+    [JsonPropertyName("attachments")] public IList<Attachment>? Attachments { get; set; }
+    [JsonPropertyName("please_ack")] public bool? PleaseAck { get; set; }
+    [JsonPropertyName("ack")] public string? Ack { get; set; }
+    [JsonPropertyName("thid")] public string? Thid { get; set; }
+    [JsonPropertyName("pthid")] public string? Pthid { get; set; }
     [JsonPropertyName("customHeaders")] public Dictionary<string, object?> CustomHeaders { get; } = new Dictionary<string, object?>();
 
 
+    [JsonConstructor]
+    public Message()
+    {
+        
+    }
+    
     public T CustomHeader<T>(string name)
     {
         return CustomHeaders.GetTyped<T>(name);

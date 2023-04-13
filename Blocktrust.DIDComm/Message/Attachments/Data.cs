@@ -1,11 +1,16 @@
 ﻿namespace Blocktrust.DIDComm.Message.Attachments;
 
+using System.Text.Json.Serialization;
 using Exceptions;
 
 public interface IData
 {
+    [JsonPropertyName("hash")]
     public string Hash { get; }
+    [JsonPropertyName("jws")]
     public Dictionary<string, object> Jws { get; }
+
+
     public abstract Dictionary<string, object> ToJsonObject();
 
     public static IData Parse(Dictionary<string, object> json)

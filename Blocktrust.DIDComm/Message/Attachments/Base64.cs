@@ -1,14 +1,21 @@
 ﻿namespace Blocktrust.DIDComm.Message.Attachments;
 
+using System.Text.Json.Serialization;
 using Exceptions;
 using Utils;
 
 public class Base64 : IData
 {
-    public string Base64String { get; private set; }
-    public string Hash { get; private set; }
-    public Dictionary<string, object> Jws { get; private set; }
+    [JsonPropertyName("base64")] public string Base64String { get; private set; }
+    [JsonPropertyName("hash")] public string Hash { get; private set; }
+    [JsonPropertyName("jws")] public Dictionary<string, object> Jws { get; private set; }
 
+    [JsonConstructor]
+    public Base64()
+    {
+        
+    }
+    
     public Base64(string base64, string hash = null, Dictionary<string, object> jws = null)
     {
         this.Base64String = base64;
