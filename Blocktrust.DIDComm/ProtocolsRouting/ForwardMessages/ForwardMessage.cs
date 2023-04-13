@@ -27,11 +27,9 @@ public class ForwardMessage
 
         //TODO is is aboslute trash
         Json? jsonAttachmentData = (Json)message.Attachments?.FirstOrDefault()?.Data;
-        var innerJson = jsonAttachmentData?.JsonString;
-        var forwardedMsg = innerJson?.GetTyped<Dictionary<string, object>>("json");
+        var forwardedMsg = jsonAttachmentData?.JsonString;
         
 
-        // var forwardedMsg = message.Attachments?.First().data.ToJsonObject().GetTyped<Dictionary<string, object>>("json");
         if (forwardedMsg == null) return null;
         if (!(forwardTo is string)) return null;
 

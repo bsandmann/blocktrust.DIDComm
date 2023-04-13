@@ -90,7 +90,7 @@ public class SecretUtils
         requiredParams.Add("crv", crv);
         requiredParams.Add("kty", kty);
         requiredParams.Add("x", x);
-        var serialized = JsonSerializer.Serialize(requiredParams);
+        var serialized = JsonSerializer.Serialize(requiredParams,SerializationOptions.UnsafeRelaxedEscaping);
         var encData = Encoding.UTF8.GetBytes(serialized);
         Org.BouncyCastle.Crypto.Digests.Sha256Digest hash = new Org.BouncyCastle.Crypto.Digests.Sha256Digest();
         hash.BlockUpdate(encData, 0, encData.Length);

@@ -21,7 +21,7 @@ public class Message
     [JsonPropertyName("expires_time")] public long? ExpiresTime { get; set; }
     [JsonPropertyName("from_prior")] public FromPrior? FromPrior { get; set; }
     [JsonPropertyName("fromPriorJwt")] public string? FromPriorJwt { get; set; }
-    [JsonPropertyName("attachments")] public IList<Attachment>? Attachments { get; set; }
+    [JsonPropertyName("attachments")] public IList<Attachment>? Attachments { get; set; } = new List<Attachment>();
     [JsonPropertyName("please_ack")] public bool? PleaseAck { get; set; }
     [JsonPropertyName("ack")] public string? Ack { get; set; }
     [JsonPropertyName("thid")] public string? Thid { get; set; }
@@ -142,9 +142,6 @@ public class Message
 
     public Dictionary<string, object?> ToJSONObject()
     {
-        //TODO this code doesn not get execute yet.
-        // but it doesn some very important things reagridn mapping
-
         var obj = new Dictionary<string, object?>
         {
             { MessageHeader.Id, Id },

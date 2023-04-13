@@ -1,20 +1,18 @@
 ﻿namespace Blocktrust.DIDComm.Message.Attachments;
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using Utils;
 
 public class Json : IData
 {
-    [JsonPropertyName("json")]
-    public Dictionary<string, object> JsonString { get; set; }
-    [JsonPropertyName("hash")]
-    public string Hash { get; set; }
-    [JsonPropertyName("jws")]
-    public Dictionary<string, object> Jws { get; set; }
+    [JsonPropertyName("json")] public Dictionary<string, object> JsonString { get; set; }
+    [JsonPropertyName("hash")] public string Hash { get; set; }
+    [JsonPropertyName("jws")] public Dictionary<string, object> Jws { get; set; }
 
     [JsonConstructor]
     public Json()
     {
-        
     }
 
     public Json(Dictionary<string, object> json = null, string hash = null, Dictionary<string, object> jws = null)
@@ -29,7 +27,7 @@ public class Json : IData
         Dictionary<string, object> jsonData = null;
         if (json.ContainsKey(Header.Json))
         {
-            jsonData = json;
+            jsonData = json.GetTyped<Dictionary<string, object>>(Header.Json);
         }
         else
         {
