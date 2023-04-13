@@ -39,6 +39,8 @@ public class SerializationTests
 
        unserializedMessage.Attachments.Count.Should().Be(2);
        unserializedMessage.Attachments[0].Id.Should().Be("1");
+       unserializedMessage.Attachments[0].Data.ToJsonObject().ToJsonString().Should().Be("""{"jws":null,"hash":null,"base64":"SGVsbG8sIHdvcmxk"}""");
        unserializedMessage.Attachments[1].Id.Should().Be("2");
+       unserializedMessage.Attachments[1].Data.ToJsonObject().ToJsonString().Should().Be("""{"jws":null,"hash":null,"json":{"foo":"bar"}}""");
     }
 }
