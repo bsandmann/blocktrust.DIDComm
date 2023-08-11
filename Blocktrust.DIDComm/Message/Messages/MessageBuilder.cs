@@ -46,7 +46,7 @@ public class MessageBuilder
         this.Typ = MessageTyp.Plaintext;
     }
 
-    public MessageBuilder from(string from)
+    public MessageBuilder from(string? from)
     {
         if (from != null && DidUtils.IsDidFragment(from))
             throw new DidCommIllegalArgumentException(from);
@@ -54,7 +54,7 @@ public class MessageBuilder
         return this;
     }
 
-    public MessageBuilder to(List<string> to)
+    public MessageBuilder to(List<string>? to)
     {
         if (to != null && to.Any(x => DidUtils.IsDidFragment(x)))
             throw new DidCommIllegalArgumentException(to.ToString());
