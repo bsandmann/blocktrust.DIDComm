@@ -21,6 +21,6 @@ public class MessageHeader
     public static readonly HashSet<string> reservedHeaderNames = new HashSet<string>
     {
         Id, Typ, Type, From, To, CreatedTime, ExpiresTime,
-        Body, Attachments, FromPrior, PleaseAck, Ack, Thid, Pthid, ReturnRoute
+        Body, Attachments, FromPrior, PleaseAck, Ack, Thid, Pthid
     }; 
 }
