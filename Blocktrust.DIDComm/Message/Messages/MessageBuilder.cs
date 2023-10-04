@@ -37,6 +37,7 @@ public class MessageBuilder
     internal string? Thid { get; private set; }
 
     internal string? Pthid { get; private set; }
+    internal string? ReturnRoute { get; private set; }
 
     public MessageBuilder(string id, Dictionary<string, object> body, string type)
     {
@@ -113,6 +114,12 @@ public class MessageBuilder
     public MessageBuilder pthid(string pthid)
     {
         this.Pthid = pthid;
+        return this;
+    }
+    
+    public MessageBuilder returnRoute(string returnRoute)
+    {
+        this.ReturnRoute = returnRoute;
         return this;
     }
 

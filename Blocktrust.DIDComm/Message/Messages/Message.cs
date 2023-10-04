@@ -27,14 +27,14 @@ public class Message
     [JsonPropertyName("thid")] public string? Thid { get; set; }
     [JsonPropertyName("pthid")] public string? Pthid { get; set; }
     [JsonPropertyName("customHeaders")] public Dictionary<string, object?> CustomHeaders { get; } = new Dictionary<string, object?>();
+    [JsonPropertyName("return_route")] public string? ReturnRoute { get; set; }
 
 
     [JsonConstructor]
     public Message()
     {
-        
     }
-    
+
     public T CustomHeader<T>(string name)
     {
         return CustomHeaders.GetTyped<T>(name);
@@ -72,6 +72,7 @@ public class Message
         Thid = builder.Thid;
         Pthid = builder.Pthid;
         CustomHeaders = builder.CustomHeaders;
+        ReturnRoute = builder.ReturnRoute;
     }
 
     public static MessageBuilder Builder(string id, Dictionary<string, object> body, string type)
@@ -131,6 +132,9 @@ public class Message
                 case MessageHeader.Pthid:
                     builder.pthid(json.GetTyped<string>(key));
                     break;
+                case MessageHeader.ReturnRoute:
+                    builder.returnRoute(json.GetTyped<string>(key));
+                    break;
                 default:
                     builder.customHeader(key, json[key]);
                     break;
@@ -158,6 +162,7 @@ public class Message
             { MessageHeader.Ack, Ack },
             { MessageHeader.Thid, Thid },
             { MessageHeader.Pthid, Pthid },
+            { MessageHeader.ReturnRoute, ReturnRoute },
         };
 
         foreach (var header in CustomHeaders)

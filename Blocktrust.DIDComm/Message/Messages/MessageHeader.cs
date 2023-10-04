@@ -16,10 +16,11 @@ public class MessageHeader
     public const string Ack = "ack";
     public const string Thid = "thid";
     public const string Pthid = "pthid";
+    public const string ReturnRoute = "return_route";
 
     public static readonly HashSet<string> reservedHeaderNames = new HashSet<string>
     {
         Id, Typ, Type, From, To, CreatedTime, ExpiresTime,
-        Body, Attachments, FromPrior, PleaseAck, Ack, Thid, Pthid
+        Body, Attachments, FromPrior, PleaseAck, Ack, Thid, Pthid, ReturnRoute
     }; 
 }
