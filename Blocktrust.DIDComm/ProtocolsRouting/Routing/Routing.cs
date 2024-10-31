@@ -54,7 +54,7 @@ public class Routing
 
         res.Insert(0, toDidService.Value);
 
-        while (DidUtils.IsDidOrDidUrl(serviceUri))
+        while (DidUtils.IsDidOrDidUrl(serviceUri.Uri))
         {
             var mediatorDid = serviceUri;
 
@@ -71,11 +71,11 @@ public class Routing
                 }
                 else
                 {
-                    throw new DidCommServiceException(res.Last().ServiceEndpoint, errMsg);
+                    throw new DidCommServiceException(res.Last().ServiceEndpoint.Uri, errMsg);
                 }
             }
 
-            var mediatorDidService = await FindDidCommService(didDocResolver, mediatorDid);
+            var mediatorDidService = await FindDidCommService(didDocResolver, mediatorDid.Uri);
             if (mediatorDidService.IsFailed)
             {
                 return mediatorDidService.ToResult();
@@ -112,7 +112,7 @@ public class Routing
         {
             Service didService = didDoc.FindDidCommService(serviceId);
 
-            if (didService.Accept != null && didService.Accept.Any() && !didService.Accept.Contains(PROFILE_DIDCOMM_V2))
+            if (didService.ServiceEndpoint.Accept != null && didService.ServiceEndpoint.Accept.Any() && !didService.ServiceEndpoint.Accept.Contains(PROFILE_DIDCOMM_V2))
             {
                 return Result.Fail($"service '{serviceId}' does not accept didcomm/v2 profile");
             }
@@ -128,7 +128,7 @@ public class Routing
             // https://identity.foundation/didcomm-messaging/spec/#multiple-endpoints
             try
             {
-                return Result.Ok(didDoc.Services.FirstOrDefault(it => it.Accept == null || !it.Accept.Any() || it.Accept.Contains(PROFILE_DIDCOMM_V2)));
+                return Result.Ok(didDoc.Services.FirstOrDefault(it => it.ServiceEndpoint.Accept == null || !it.ServiceEndpoint.Accept.Any() || it.ServiceEndpoint.Accept.Contains(PROFILE_DIDCOMM_V2)));
             }
             catch (DidDocException e)
             {

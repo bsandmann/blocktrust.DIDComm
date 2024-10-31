@@ -313,7 +313,7 @@ public class DIDDocBob
             new Service
             (
                 id : "did:example:123456789abcdefghi#didcomm-1",
-                serviceEndpoint : "http://example.com/path",
+                serviceEndpoint : new ServiceEndpoint( uri: "http://example.com/path",
                 accept : new List<string>
                 {
                     Routing.PROFILE_DIDCOMM_V2,
@@ -323,6 +323,7 @@ public class DIDDocBob
                 {
                     "did:example:mediator1#key-x25519-1"
                 }
+                )
             )
         },
         VerificationMethods = new List<VerificationMethod>

@@ -174,7 +174,7 @@ public class DIDDocAlice
             new Service
             (
                 id : "did:example:123456789abcdefghi#didcomm-1",
-                serviceEndpoint : "did:example:mediator1",
+                serviceEndpoint : new ServiceEndpoint(uri: "did:example:mediator1",
                 accept : new List<string>
                 {
                     Routing.PROFILE_DIDCOMM_V2,
@@ -184,6 +184,7 @@ public class DIDDocAlice
                 {
                     "did:example:mediator2#key-p521-1"
                 }
+                )
             )
         },
         VerificationMethods = new List<VerificationMethod>

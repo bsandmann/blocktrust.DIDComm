@@ -78,7 +78,7 @@ public static class PackEncrypt
             return null;
         }
 
-        List<string> routingKeys = didServicesChain.Last().RoutingKeys;
+        List<string> routingKeys = didServicesChain.Last().ServiceEndpoint.RoutingKeys;
 
         if (routingKeys.Count == 0)
         {
@@ -87,7 +87,7 @@ public static class PackEncrypt
 
         if (didServicesChain.Count > 1)
         {
-            routingKeys.AddRange(didServicesChain.Skip(1).Select(it => it.ServiceEndpoint).ToList());
+            routingKeys.AddRange(didServicesChain.Skip(1).Select(it => it.ServiceEndpoint.Uri).ToList());
         }
 
         var r = new Routing(didDocResolver, secretResolver);

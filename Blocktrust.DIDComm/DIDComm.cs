@@ -204,7 +204,7 @@ public class DidComm
             ? null
             : new ServiceMetadata(
                 didServicesChainResult.Value.Last().Id,
-                didServicesChainResult.Value.First().ServiceEndpoint
+                didServicesChainResult.Value.First().ServiceEndpoint.Uri
             );
 
         return Result.Ok(new PackEncryptedResult(

@@ -96,7 +96,7 @@ public class DIDDocCharlie
             new Service
             (
                 id : "did:example:123456789abcdefghi#didcomm-1",
-                serviceEndpoint :"did:example:mediator2",
+                serviceEndpoint : new ServiceEndpoint(uri:"did:example:mediator2",
                 accept : new List<string>
                 {
                     Routing.PROFILE_DIDCOMM_V2,
@@ -106,6 +106,7 @@ public class DIDDocCharlie
                 {
                     "did:example:mediator1#key-x25519-1"
                 }
+                )
             )
         },
         VerificationMethods = new List<VerificationMethod>
