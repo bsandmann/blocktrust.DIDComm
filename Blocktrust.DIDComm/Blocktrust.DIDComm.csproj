@@ -6,7 +6,7 @@
         <RootNamespace>Blocktrust.DIDComm</RootNamespace>
         <TargetFramework>net8.0</TargetFramework>
         <PublishTrimmed>true</PublishTrimmed>
-        <Version>3.0.0</Version>
+        <Version>3.1.0</Version>
         <Authors>Bjoern Sandmann / blocktrust</Authors>
         <Description>Port of the SICPA DIDComm v2 implementation to .net</Description>
         <Copyright>Bjoern Sandmann / blocktrust</Copyright>
@@ -16,7 +16,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blocktrust.Common" Version="0.3.0" />
+        <PackageReference Include="Blocktrust.Common" Version="0.3.1" />
         <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
         <PackageReference Include="FluentResults" Version="3.15.2" />
         <PackageReference Include="SimpleBase" Version="4.0.0" />
