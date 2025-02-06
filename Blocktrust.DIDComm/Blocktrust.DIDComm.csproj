@@ -21,4 +21,8 @@
         <PackageReference Include="SimpleBase" Version="4.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\blocktrust.PeerDID\Blocktrust.PeerDID\Blocktrust.PeerDID.csproj" />
+    </ItemGroup>
+
 </Project>

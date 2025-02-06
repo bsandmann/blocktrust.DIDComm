@@ -183,11 +183,11 @@ public class RecipientKeySelectorTests
     }
 
     [Fact]
-    public void Test_find_anoncrypt_unpack_recipient_private_keys_all_kids_unknown()
+    public async Task Test_find_anoncrypt_unpack_recipient_private_keys_all_kids_unknown()
     {
         var keySelector = new RecipientKeySelector(new DidDocResolverMock(), TestUtils.GetSecretsResolver(TestUtils.Person.BOB));
 
-        Assert.ThrowsAsync<SecretNotFoundException>(async () => (await keySelector.FindAnonCryptKeys(new List<string> { JWMFixture.BOB_DID + "#unknown-key-1", JWMFixture.BOB_DID + "#unknown-key-2" })).ToList());
+        await Assert.ThrowsAsync<SecretNotFoundException>(async () => (await keySelector.FindAnonCryptKeys(new List<string> { JWMFixture.BOB_DID + "#unknown-key-1", JWMFixture.BOB_DID + "#unknown-key-2" })).ToList());
     }
 
     [Fact]
